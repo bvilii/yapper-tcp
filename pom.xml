@@ -7,6 +7,10 @@
     <groupId>io.github.bvilii</groupId>
     <artifactId>yapper-tcp</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <modules>
+        <module>yapper-server</module>
+    </modules>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
