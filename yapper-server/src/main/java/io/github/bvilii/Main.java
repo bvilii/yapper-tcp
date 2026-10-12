@@ -5,6 +5,9 @@
 
     import java.io.IOException;
     import java.net.ServerSocket;
+    import java.net.Socket;
+    import java.util.ArrayList;
+    import java.util.List;
     import java.util.concurrent.atomic.AtomicBoolean;
 
     public class Main {
@@ -13,12 +16,19 @@
         private static final AtomicBoolean shuttingDown = new AtomicBoolean(false);
 
         public static void main(String[] args) {
+            List<Socket> connections = new ArrayList<>();
 
             try (ServerSocket serverSocket = new ServerSocket(9000)) {
                 log.info("The server has started on port: {}", serverSocket.getLocalPort());
                 running = true;
 
                 Runtime.getRuntime().addShutdownHook(new Thread(() -> shutdown(serverSocket)));
+
+                while (running){
+                    Socket clientSocket = serverSocket.accept();
+                    connections.add(clientSocket);
+                    log.info("A client has connected: {}", clientSocket);
+                }
 
             } catch (IOException e) {
                 log.error("An unexpected error occurred while running the server", e);
