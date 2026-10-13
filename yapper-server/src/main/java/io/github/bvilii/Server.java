@@ -4,10 +4,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -20,7 +22,23 @@ public class Server {
 
 
     public void start(){
-        try (ServerSocket listener = new ServerSocket(9000)) {
+
+        Properties properties = new Properties();
+
+        try (InputStream input = Server.class.getClassLoader().getResourceAsStream("config.properties")) {
+            if(input == null){
+                log.warn("Unable to find config.properties in resources");
+            }else {
+                properties.load(input);
+            }
+        } catch (Exception e) {
+            log.warn("Error reading config.properties", e);
+        }
+
+        int port = Integer.parseInt(properties.getProperty("server.port", "9099"));
+
+
+        try (ServerSocket listener = new ServerSocket(port)) {
             serverSocket.set(listener);
             log.info("Server started on port: {}", listener.getLocalPort());
             running = true;
