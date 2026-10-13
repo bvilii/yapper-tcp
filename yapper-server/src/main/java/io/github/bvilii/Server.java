@@ -22,19 +22,19 @@ public class Server {
     public void start(){
         try (ServerSocket listener = new ServerSocket(9000)) {
             serverSocket.set(listener);
-            log.info("The server has started on port: {}", listener.getLocalPort());
+            log.info("Server started on port: {}", listener.getLocalPort());
             running = true;
             Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
 
             while (running) {
                 Socket clientSocket = listener.accept();
                 registry.add(clientSocket);
-                log.info("A client has connected: {}", clientSocket);
+                log.info("Client connected: {}", listener);
             }
 
         } catch (IOException e) {
             if (running) {
-                log.error("An unexpected error occurred while running the server", e);
+                log.error("Unexpected error in server while running", e);
                 running = false;
             }
         }
