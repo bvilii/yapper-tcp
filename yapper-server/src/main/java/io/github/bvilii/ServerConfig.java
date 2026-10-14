@@ -9,7 +9,7 @@ import java.util.Properties;
 
 public class ServerConfig {
     private static final Logger log = LoggerFactory.getLogger(ServerConfig.class);
-    private int port;
+    private final int port;
 
     public ServerConfig(int port){
         this.port = port;
