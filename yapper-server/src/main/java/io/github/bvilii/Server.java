@@ -6,12 +6,10 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Server {
     private static final Logger log = LoggerFactory.getLogger(Server.class);
-    private final AtomicBoolean shuttingDown = new AtomicBoolean(false);
     private final AtomicReference<ServerSocket> serverSocket = new AtomicReference<>();
     private final ServerConfig config;
 
@@ -25,33 +23,41 @@ public class Server {
             serverSocket.set(listener);
             log.info("Server started on port: {}", listener.getLocalPort());
 
-            while (!shuttingDown.get()) {
-                Socket clientSocket = listener.accept();
-                log.info("Client connected: {}", clientSocket);
+            while (!listener.isClosed()) {
+                acceptClients(listener);
             }
 
         } catch (IOException e) {
-            if (!shuttingDown.get()) {
-                log.error("Unexpected error in server while running", e);
+            if(serverSocket.get() == null){
+                log.error("Error while starting or closing the server", e);
             }
+        }
+    }
+
+    private void acceptClients(ServerSocket listener) {
+        try {
+            Socket clientSocket = listener.accept();
+            log.info("Client connected: {}", clientSocket);
+        } catch (IOException e) {
+            if(listener.isClosed()){
+                return;
+            }
+            log.warn("Error while accepting a client", e);
         }
     }
 
     public void shutdown() {
-        if (!shuttingDown.compareAndSet(false, true)) {
+        ServerSocket socket = serverSocket.get();
+        if(socket == null){
             return;
         }
-        log.info("Server shutting down...");
 
+        log.info("Server shutting down...");
         try {
-            ServerSocket socket = serverSocket.get();
-            if (socket != null) {
-                socket.close();
-            }
+           socket.close();
         } catch (IOException e) {
             log.warn("Error while closing the server", e);
         }
     }
-
 
 }
