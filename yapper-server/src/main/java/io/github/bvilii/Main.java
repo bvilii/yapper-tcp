@@ -3,7 +3,8 @@ package io.github.bvilii;
 
 public class Main {
     public static void main(String[] args) {
-        Server server = new Server();
+        ServerConfig config = ServerConfig.load();
+        Server server = new Server(config);
         server.start();
     }
 }
