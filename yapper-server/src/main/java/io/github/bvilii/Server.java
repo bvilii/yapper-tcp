@@ -19,7 +19,7 @@ public class Server {
 
 
     public void start(){
-        try (ServerSocket listener = new ServerSocket(config.getPort())) {
+        try (ServerSocket listener = new ServerSocket(config.port())) {
             serverSocket.set(listener);
             log.info("Server started on port: {}", listener.getLocalPort());
 
