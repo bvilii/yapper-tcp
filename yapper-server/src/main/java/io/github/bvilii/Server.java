@@ -1,5 +1,6 @@
 package io.github.bvilii;
 
+import io.github.bvilii.config.ServerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,4 +1,4 @@
-package io.github.bvilii;
+package io.github.bvilii.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

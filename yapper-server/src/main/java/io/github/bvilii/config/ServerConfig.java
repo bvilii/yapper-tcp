@@ -1,4 +1,4 @@
-package io.github.bvilii;
+package io.github.bvilii.config;
 
 public record ServerConfig(int port) {
 
