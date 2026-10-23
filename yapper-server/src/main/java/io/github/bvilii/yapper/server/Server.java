@@ -1,6 +1,6 @@
-package io.github.bvilii;
+package io.github.bvilii.yapper.server;
 
-import io.github.bvilii.config.ServerConfig;
+import io.github.bvilii.yapper.server.config.ServerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

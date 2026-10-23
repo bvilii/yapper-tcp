@@ -1,6 +1,5 @@
-package io.github.bvilii;
+package io.github.bvilii.yapper.server.config;
 
-import io.github.bvilii.config.ServerConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
