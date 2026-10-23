@@ -9,8 +9,8 @@ import java.util.Optional;
 
 public class ServerConfigFactory {
     private static final Logger log = LoggerFactory.getLogger(ServerConfigFactory.class);
-    public static final String DEFAULT_ENV_PORT_KEY = "SERVER_PORT";
-    private static final int DEFAULT_PORT = 9099;
+    private static final String DEFAULT_ENV_PORT_KEY = "SERVER_PORT";
+    static final int DEFAULT_PORT = 9099;
 
     private ServerConfigFactory() {
     }
