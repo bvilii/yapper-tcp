@@ -1,0 +1,41 @@
+package io.github.bvilii.config;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Optional;
+
+
+public class ServerConfigFactory {
+    private static final Logger log = LoggerFactory.getLogger(ServerConfigFactory.class);
+    public static final String DEFAULT_ENV_PORT_KEY = "SERVER_PORT";
+    private static final int DEFAULT_PORT = 9099;
+
+    private ServerConfigFactory() {
+    }
+
+    public static ServerConfig load() {
+        Optional<ServerConfig> envConfig = loadFromEnv();
+        if (envConfig.isEmpty()) {
+            log.info("Env variable: {}, not set or is blank ---> falling back to default port: {}", DEFAULT_ENV_PORT_KEY, DEFAULT_PORT);
+            return new ServerConfig(DEFAULT_PORT);
+        }
+
+        return envConfig.orElseThrow();
+    }
+
+    private static Optional<ServerConfig> loadFromEnv() {
+        String portStr = System.getenv(DEFAULT_ENV_PORT_KEY);
+        if (portStr == null || portStr.isBlank()) {
+            return Optional.empty();
+        }
+
+        try {
+            int port = Integer.parseInt(portStr);
+            return Optional.of(new ServerConfig(port));
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid port configuration: " + portStr, e);
+        }
+    }
+
+}
