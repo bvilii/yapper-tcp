@@ -1,4 +1,4 @@
-package io.github.bvilii.config;
+package io.github.bvilii.yapper.server.config;
 
 public record ServerConfig(int port) {
 

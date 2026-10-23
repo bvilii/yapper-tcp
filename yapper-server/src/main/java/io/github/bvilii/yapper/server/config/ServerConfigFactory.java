@@ -1,8 +1,9 @@
-package io.github.bvilii.config;
+package io.github.bvilii.yapper.server.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -15,7 +16,11 @@ public class ServerConfigFactory {
     }
 
     public static ServerConfig load() {
-        Optional<ServerConfig> envConfig = loadFromEnv();
+        return load(System.getenv());
+    }
+
+    static ServerConfig load(Map<String, String> env) {
+        Optional<ServerConfig> envConfig = loadFromEnv(env);
         if (envConfig.isEmpty()) {
             log.info("Env variable: {}, not set or is blank ---> falling back to default port: {}", DEFAULT_ENV_PORT_KEY, DEFAULT_PORT);
             return new ServerConfig(DEFAULT_PORT);
@@ -24,8 +29,8 @@ public class ServerConfigFactory {
         return envConfig.orElseThrow();
     }
 
-    private static Optional<ServerConfig> loadFromEnv() {
-        String portStr = System.getenv(DEFAULT_ENV_PORT_KEY);
+    private static Optional<ServerConfig> loadFromEnv(Map<String, String> env) {
+        String portStr = env.get(DEFAULT_ENV_PORT_KEY);
         if (portStr == null || portStr.isBlank()) {
             return Optional.empty();
         }

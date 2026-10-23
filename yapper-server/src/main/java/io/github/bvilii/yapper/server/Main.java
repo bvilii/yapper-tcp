@@ -1,8 +1,8 @@
-package io.github.bvilii;
+package io.github.bvilii.yapper.server;
 
 
-import io.github.bvilii.config.ServerConfig;
-import io.github.bvilii.config.ServerConfigFactory;
+import io.github.bvilii.yapper.server.config.ServerConfig;
+import io.github.bvilii.yapper.server.config.ServerConfigFactory;
 
 public class Main {
     public static void main(String[] args) {
