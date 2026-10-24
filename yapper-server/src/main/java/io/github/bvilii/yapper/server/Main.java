@@ -8,7 +8,9 @@ public class Main {
     public static void main(String[] args) {
         ServerConfig config = ServerConfigFactory.load();
 
-        Server server = new Server(config);
+        ChatRoom chatRoom = new ChatRoom();
+
+        Server server = new Server(config, chatRoom);
         Runtime.getRuntime().addShutdownHook(new Thread(server::shutdown));
         server.start();
     }
