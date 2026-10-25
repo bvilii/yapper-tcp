@@ -1,4 +1,6 @@
-package io.github.bvilii.yapper.server;
+package io.github.bvilii.yapper.server.chat;
+
+import io.github.bvilii.yapper.server.client.MessageReceiver;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;

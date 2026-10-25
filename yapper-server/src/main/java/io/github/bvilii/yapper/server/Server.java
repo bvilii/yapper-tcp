@@ -1,5 +1,7 @@
 package io.github.bvilii.yapper.server;
 
+import io.github.bvilii.yapper.server.chat.ChatRoom;
+import io.github.bvilii.yapper.server.client.ClientHandler;
 import io.github.bvilii.yapper.server.config.ServerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

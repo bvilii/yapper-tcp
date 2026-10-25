@@ -1,4 +1,4 @@
-package io.github.bvilii.yapper.server;
+package io.github.bvilii.yapper.server.client;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
