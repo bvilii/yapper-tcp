@@ -1,6 +1,7 @@
 package io.github.bvilii.yapper.server;
 
 
+import io.github.bvilii.yapper.server.chat.ChatRoom;
 import io.github.bvilii.yapper.server.config.ServerConfig;
 import io.github.bvilii.yapper.server.config.ServerConfigFactory;
 
