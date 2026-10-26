@@ -15,7 +15,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class ClientHandler {
+public class ClientHandler implements Disconnectable {
     private static final Logger log = LoggerFactory.getLogger(ClientHandler.class);
     private final Socket clientSocket;
     private final ClientReader reader;
@@ -44,6 +44,7 @@ public class ClientHandler {
         executor.execute(writer);
     }
 
+    @Override
     public void disconnect() {
         if (!disconnected.compareAndSet(false, true)) {
             return;
@@ -60,6 +61,7 @@ public class ClientHandler {
         log.info("Client disconnected: {}", clientSocket);
     }
 
+    @Override
     public boolean isDisconnected() {
         return disconnected.get();
     }
