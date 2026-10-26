@@ -14,11 +14,11 @@ public class ClientWriter implements Runnable, Observer {
     private static final String POISON_PILL = "POISON_PILL";
     private final BufferedWriter socketWriter;
     private final BlockingQueue<String> messagesQueue = new LinkedBlockingQueue<>();
-    private final ClientHandler handler;
+    private final Disconnectable connection;
 
-    public ClientWriter(BufferedWriter socketWriter, ClientHandler handler) {
+    public ClientWriter(BufferedWriter socketWriter, Disconnectable connection) {
         this.socketWriter = socketWriter;
-        this.handler = handler;
+        this.connection = connection;
     }
 
     @Override
@@ -26,7 +26,7 @@ public class ClientWriter implements Runnable, Observer {
         try {
             while (true) {
                 String msg = messagesQueue.take();
-                if (handler.isDisconnected()) {
+                if (connection.isDisconnected()) {
                     return;
                 }
 
@@ -35,13 +35,13 @@ public class ClientWriter implements Runnable, Observer {
                 socketWriter.flush();
             }
         } catch (IOException e) {
-            if (!handler.isDisconnected()) {
+            if (!connection.isDisconnected()) {
                 log.warn("Error while writing to client", e);
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         } finally {
-            handler.disconnect();
+            connection.disconnect();
         }
     }
 

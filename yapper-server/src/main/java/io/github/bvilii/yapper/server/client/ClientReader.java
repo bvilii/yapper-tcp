@@ -11,12 +11,12 @@ public class ClientReader implements Runnable {
     private static final int MAX_MESSAGE_LENGTH = 2000;
     private final BufferedReader socketReader;
     private final MessageReceiver messageReceiver;
-    private final ClientHandler handler;
+    private final Disconnectable connection;
 
-    public ClientReader(BufferedReader socketReader, MessageReceiver messageReceiver, ClientHandler handler) {
+    public ClientReader(BufferedReader socketReader, MessageReceiver messageReceiver, Disconnectable connection) {
         this.socketReader = socketReader;
         this.messageReceiver = messageReceiver;
-        this.handler = handler;
+        this.connection = connection;
     }
 
 
@@ -28,11 +28,11 @@ public class ClientReader implements Runnable {
                 messageReceiver.onMessageReceived(line);
             }
         } catch (IOException e) {
-            if (!handler.isDisconnected()) {
+            if (!connection.isDisconnected()) {
                 log.warn("Error while reading from client", e);
             }
         } finally {
-            handler.disconnect();
+            connection.disconnect();
         }
     }
 
