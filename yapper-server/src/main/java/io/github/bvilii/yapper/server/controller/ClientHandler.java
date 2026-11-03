@@ -1,7 +1,7 @@
 package io.github.bvilii.yapper.server.controller;
 
-import io.github.bvilii.yapper.common.message.MessageCodec;
 import io.github.bvilii.yapper.server.network.ClientConnection;
+import io.github.bvilii.yapper.server.persistence.User;
 
 import java.io.IOException;
 import java.util.concurrent.Executor;
@@ -10,6 +10,7 @@ public class ClientHandler implements Runnable {
     private final Executor executor;
     private final ClientConnection connection;
     private final MessageController router;
+    private User user;
 
     public ClientHandler(Executor executor, ClientConnection connection, MessageController router) {
         this.executor = executor;
@@ -38,5 +39,13 @@ public class ClientHandler implements Runnable {
 
     public void send(String message) {
         connection.writeToClient(message);
+    }
+
+    public boolean isAuthenticated() {
+        return user != null;
+    }
+
+    public void authenticate(User user){
+        this.user = user;
     }
 }
