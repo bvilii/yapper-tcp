@@ -38,7 +38,7 @@ public class MessageController {
 
         switch (message) {
             case RegisterRequest request -> authService.handleRegister(request, sender);
-            case LoginRequest request -> sender.send(codec.encode(new ErrorMessage("Not supported yet")));
+            case LoginRequest request -> authService.handleLogin(request, sender);
             case SendChat request -> sender.send(codec.encode(new ErrorMessage("Not supported yet")));
             case TokenLoginRequest request -> sender.send(codec.encode(new ErrorMessage("Not supported yet")));
         }
