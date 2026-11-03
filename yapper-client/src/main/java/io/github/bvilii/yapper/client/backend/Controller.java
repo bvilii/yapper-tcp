@@ -1,4 +1,4 @@
-package io.github.bvilii.yapper.client;
+package io.github.bvilii.yapper.client.backend;
 
 import java.io.IOException;
 
@@ -28,7 +28,6 @@ public class Controller implements Runnable {
     private void startReadingFromServerLoop() throws IOException {
         while (true) {
             String message = connection.getMessageFromServer();
-            System.out.println(message);
         }
     }
 }
