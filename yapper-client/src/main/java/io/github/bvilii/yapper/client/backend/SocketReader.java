@@ -1,4 +1,4 @@
-package io.github.bvilii.yapper.client;
+package io.github.bvilii.yapper.client.backend;
 
 import java.io.BufferedReader;
 import java.io.IOException;
