@@ -1,16 +1,16 @@
-package io.github.bvilii.yapper.client;
+package io.github.bvilii.yapper.client.backend;
 
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 public class ServerConnection {
     private final Executor executor;
     private BufferedReader br;
     private BufferedWriter bw;
     private SocketWriter writer;
+    private SocketReader reader;
 
 
     public ServerConnection(Executor executor) {
@@ -34,8 +34,9 @@ public class ServerConnection {
     }
 
     public String getMessageFromServer() throws IOException {
-        SocketReader reader = new SocketReader(br);
+        if(reader == null){
+            reader = new SocketReader(br);
+        }
         return reader.readFromServer();
     }
-
 }
