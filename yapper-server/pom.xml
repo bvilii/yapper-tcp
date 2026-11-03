@@ -28,6 +28,11 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.github.bvilii</groupId>
+            <artifactId>yapper-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
     </dependencies>
 
