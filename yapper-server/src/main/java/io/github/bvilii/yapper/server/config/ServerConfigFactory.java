@@ -4,12 +4,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
-import java.util.Optional;
-
 
 public class ServerConfigFactory {
     private static final Logger log = LoggerFactory.getLogger(ServerConfigFactory.class);
     private static final String DEFAULT_ENV_PORT_KEY = "SERVER_PORT";
+    private static final String DB_URL_KEY = "DB_URL";
+    private static final String DB_USER_KEY = "DB_USER";
+    private static final String DB_PASSWORD_KEY = "DB_PASSWORD";
     static final int DEFAULT_PORT = 9099;
 
     private ServerConfigFactory() {
@@ -20,27 +21,32 @@ public class ServerConfigFactory {
     }
 
     static ServerConfig load(Map<String, String> env) {
-        Optional<ServerConfig> envConfig = loadFromEnv(env);
-        if (envConfig.isEmpty()) {
-            log.info("Env variable: {}, not set or is blank ---> falling back to default port: {}", DEFAULT_ENV_PORT_KEY, DEFAULT_PORT);
-            return new ServerConfig(DEFAULT_PORT);
-        }
-
-        return envConfig.orElseThrow();
+        int port = parsePort(env);
+        String dbUrl = requireEnv(env, DB_URL_KEY);
+        String dbUser = requireEnv(env, DB_USER_KEY);
+        String dbPassword = requireEnv(env, DB_PASSWORD_KEY);
+        return new ServerConfig(port, dbUrl, dbUser, dbPassword);
     }
 
-    private static Optional<ServerConfig> loadFromEnv(Map<String, String> env) {
+    private static int parsePort(Map<String, String> env) {
         String portStr = env.get(DEFAULT_ENV_PORT_KEY);
         if (portStr == null || portStr.isBlank()) {
-            return Optional.empty();
+            log.info("Env variable: {}, not set or is blank ---> falling back to default port: {}", DEFAULT_ENV_PORT_KEY, DEFAULT_PORT);
+            return DEFAULT_PORT;
         }
 
         try {
-            int port = Integer.parseInt(portStr);
-            return Optional.of(new ServerConfig(port));
+            return Integer.parseInt(portStr);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid port configuration: " + portStr, e);
         }
     }
 
+    private static String requireEnv(Map<String, String> env, String key) {
+        String value = env.get(key);
+        if (value == null || value.isBlank()) {
+            throw new IllegalStateException("Required env variable not set or blank: " + key);
+        }
+        return value;
+    }
 }
