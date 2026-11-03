@@ -27,5 +27,20 @@ public class MessageController {
             return;
         }
 
+        boolean isAuthMessage = message instanceof RegisterRequest
+                || message instanceof LoginRequest
+                || message instanceof TokenLoginRequest;
+
+        if (!sender.isAuthenticated() && !isAuthMessage) {
+            sender.send(codec.encode(new ErrorMessage("Not authenticated")));
+            return;
+        }
+
+        switch (message) {
+            case RegisterRequest request -> authService.handleRegister(request, sender);
+            case LoginRequest request -> sender.send(codec.encode(new ErrorMessage("Not supported yet")));
+            case SendChat request -> sender.send(codec.encode(new ErrorMessage("Not supported yet")));
+            case TokenLoginRequest request -> sender.send(codec.encode(new ErrorMessage("Not supported yet")));
+        }
     }
 }
