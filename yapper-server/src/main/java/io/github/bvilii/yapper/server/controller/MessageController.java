@@ -3,6 +3,10 @@ package io.github.bvilii.yapper.server.controller;
 import io.github.bvilii.yapper.common.message.InvalidMessageException;
 import io.github.bvilii.yapper.common.message.MessageCodec;
 import io.github.bvilii.yapper.common.message.client.*;
+import io.github.bvilii.yapper.common.message.client.LoginRequest;
+import io.github.bvilii.yapper.common.message.client.RegisterRequest;
+import io.github.bvilii.yapper.common.message.client.TokenLoginRequest;
+import io.github.bvilii.yapper.common.message.client.SendChat;
 import io.github.bvilii.yapper.common.message.server.ErrorMessage;
 import io.github.bvilii.yapper.server.service.AuthService;
 import io.github.bvilii.yapper.server.service.ChatService;
@@ -41,6 +45,8 @@ public class MessageController {
             case LoginRequest request -> authService.handleLogin(request, sender);
             case SendChat request -> sender.send(codec.encode(new ErrorMessage("Not supported yet")));
             case TokenLoginRequest request -> sender.send(codec.encode(new ErrorMessage("Not supported yet")));
+            case CreateRoomRequest createRoomRequest -> {
+            }
         }
     }
 }
