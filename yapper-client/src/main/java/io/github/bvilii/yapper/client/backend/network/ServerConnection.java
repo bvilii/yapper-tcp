@@ -1,4 +1,4 @@
-package io.github.bvilii.yapper.client.backend;
+package io.github.bvilii.yapper.client.backend.network;
 
 import java.io.*;
 import java.net.Socket;
@@ -24,19 +24,19 @@ public class ServerConnection {
         bw = new BufferedWriter(new OutputStreamWriter(serverSocket.getOutputStream(), StandardCharsets.UTF_8));
     }
 
-    public void startWriter() {
+    public void startWriterThread() {
         writer = new SocketWriter(bw);
         executor.execute(writer);
     }
 
-    public void writeToServer(String message){
-        writer.addToQueue(message);
+    public void writeToServer(String line){
+        writer.addToQueue(line);
     }
 
-    public String getMessageFromServer() throws IOException {
+    public String readFromServer() throws IOException {
         if(reader == null){
             reader = new SocketReader(br);
         }
-        return reader.readFromServer();
+        return reader.readLine();
     }
 }

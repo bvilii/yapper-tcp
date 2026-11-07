@@ -1,4 +1,4 @@
-package io.github.bvilii.yapper.client.backend;
+package io.github.bvilii.yapper.client.backend.network;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,7 +10,7 @@ public class SocketReader {
         this.br = br;
     }
 
-    public String readFromServer() throws IOException {
+    public String readLine() throws IOException {
         String line = br.readLine();
         if (line == null){
             System.exit(1);

@@ -1,14 +1,18 @@
 package io.github.bvilii.yapper.client.frontend.auth;
 
 import com.formdev.flatlaf.FlatClientProperties;
-import io.github.bvilii.yapper.client.backend.Controller;
+import io.github.bvilii.yapper.client.backend.service.auth.AuthObserver;
+import io.github.bvilii.yapper.client.backend.service.auth.AuthService;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class LoginPanel extends JPanel {
+public class LoginPanel extends JPanel implements AuthObserver {
+    private final JLabel loginErrorText;
+    private final JTextField usernameField;
+    private final JPasswordField passwordField;
 
-    public LoginPanel(Controller controller, Runnable showRegister){
+    public LoginPanel(AuthService authService, Runnable showRegister) {
         // LoginPanel configurations
         setLayout(new GridBagLayout());
 
@@ -45,7 +49,7 @@ public class LoginPanel extends JPanel {
         backgroundCard.add(username);
         backgroundCard.add(Box.createVerticalStrut(6));
 
-        JTextField usernameField = new JTextField(20);
+        usernameField = new JTextField(20);
         usernameField.setEditable(true);
         usernameField.putClientProperty(FlatClientProperties.STYLE, "focusedBorderColor: #ab0a6b");
         usernameField.setForeground(Color.WHITE);
@@ -64,7 +68,7 @@ public class LoginPanel extends JPanel {
         backgroundCard.add(password);
         backgroundCard.add(Box.createVerticalStrut(6));
 
-        JPasswordField passwordField = new JPasswordField(20);
+        passwordField = new JPasswordField(20);
         passwordField.setEditable(true);
         passwordField.putClientProperty(FlatClientProperties.STYLE, "focusedBorderColor: #ab0a6b; showRevealButton: true");
         passwordField.setForeground(Color.WHITE);
@@ -87,6 +91,13 @@ public class LoginPanel extends JPanel {
         backgroundCard.add(loginButton);
         backgroundCard.add(Box.createVerticalStrut(10));
 
+        loginErrorText = new JLabel();
+        loginErrorText.setForeground(Color.RED);
+        loginErrorText.setFont(username.getFont().deriveFont(Font.PLAIN));
+        loginErrorText.setVisible(false);
+        backgroundCard.add(loginErrorText);
+        backgroundCard.add(Box.createVerticalStrut(6));
+
         JLabel account = new JLabel("Need an account?");
         account.setForeground(UIManager.getColor("Label.disabledForeground"));
         backgroundCard.add(account);
@@ -101,8 +112,23 @@ public class LoginPanel extends JPanel {
         register.addActionListener(e -> showRegister.run());
         backgroundCard.add(register);
 
-
+        loginButton.addActionListener(e -> submit(authService));
 
         add(backgroundCard);
+    }
+
+    private void submit(AuthService authService){
+        String username = usernameField.getText().trim();
+        char[] password = passwordField.getPassword();
+
+        authService.login(username, new String(password));
+    }
+
+    @Override
+    public void onLoginFailed(String reason){
+        SwingUtilities.invokeLater(() -> {
+            loginErrorText.setText(reason);
+            loginErrorText.setVisible(true);
+        });
     }
 }

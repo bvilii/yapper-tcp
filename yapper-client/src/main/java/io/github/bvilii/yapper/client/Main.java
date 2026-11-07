@@ -3,29 +3,43 @@ package io.github.bvilii.yapper.client;
 import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.fonts.inter.FlatInterFont;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
-import io.github.bvilii.yapper.client.backend.Controller;
-import io.github.bvilii.yapper.client.backend.ServerConnection;
+import io.github.bvilii.yapper.client.backend.controller.ClientController;
+import io.github.bvilii.yapper.client.backend.controller.MessageController;
+import io.github.bvilii.yapper.client.backend.network.ServerConnection;
+import io.github.bvilii.yapper.client.backend.service.auth.AuthService;
+import io.github.bvilii.yapper.client.backend.service.room.RoomService;
 import io.github.bvilii.yapper.client.frontend.MainWindow;
+import io.github.bvilii.yapper.common.message.MessageCodec;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         Executor executor = Executors.newVirtualThreadPerTaskExecutor();
 
+
+        MessageCodec codec = new MessageCodec();
         ServerConnection connection = new ServerConnection(executor);
-        Controller controller = new Controller(connection);
-        executor.execute(controller);
+        AuthService authService = new AuthService(connection, codec);
+        RoomService roomService = new RoomService(codec, connection);
+        MessageController router = new MessageController(codec, authService, roomService);
+        ClientController controller = new ClientController(connection, router);
 
 
         SwingUtilities.invokeLater(() -> {
 
             FlatInterFont.install();
             FlatLaf.setPreferredFontFamily(FlatInterFont.FAMILY);
-            FlatMacDarkLaf.setup();
+            FlatLaf.setup(new FlatMacDarkLaf() {
+                @Override
+                public void provideErrorFeedback(Component component) {
+                    // NO BEEP
+                }
+            });
             UIManager.put("Component.focusWidth", 0);
 
             UIManager.put("Button.arc", 12);
@@ -35,8 +49,12 @@ public class Main {
             UIManager.put("List.selectionArc", 12);
             UIManager.put("List.selectionInsets", new Insets(2, 6, 2, 6));
 
-            new MainWindow(controller).show();
+            MainWindow window = new MainWindow(authService, roomService);
+            authService.addObserver(window);
+            window.show();
         });
+
+        controller.start();
 
     }
 }
