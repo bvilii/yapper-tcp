@@ -1,18 +1,19 @@
 package io.github.bvilii.yapper.client.frontend.auth;
 
 import com.formdev.flatlaf.FlatClientProperties;
-import io.github.bvilii.yapper.client.backend.Controller;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.github.bvilii.yapper.client.backend.service.auth.AuthObserver;
+import io.github.bvilii.yapper.client.backend.service.auth.AuthService;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class RegisterPanel extends JPanel {
+public class RegisterPanel extends JPanel implements AuthObserver {
+    private final JLabel registerErrorText;
+    private final JTextField usernameField;
+    private final JPasswordField passwordField;
+    private final JTextField emailField;
 
-    private static final Logger log = LoggerFactory.getLogger(RegisterPanel.class);
-
-    public RegisterPanel(Controller controller, Runnable showLogin){
+    public RegisterPanel(AuthService authService, Runnable showLogin) {
         // RegisterPanel configurations
         setLayout(new GridBagLayout());
 
@@ -49,7 +50,7 @@ public class RegisterPanel extends JPanel {
         backgroundCard.add(email);
         backgroundCard.add(Box.createVerticalStrut(6));
 
-        JTextField emailField = new JTextField(20);
+        emailField = new JTextField(20);
         emailField.setEditable(true);
         emailField.putClientProperty(FlatClientProperties.STYLE, "focusedBorderColor: #ab0a6b");
         emailField.setForeground(Color.WHITE);
@@ -68,7 +69,7 @@ public class RegisterPanel extends JPanel {
         backgroundCard.add(username);
         backgroundCard.add(Box.createVerticalStrut(6));
 
-        JTextField usernameField = new JTextField(20);
+        usernameField = new JTextField(20);
         usernameField.setEditable(true);
         usernameField.putClientProperty(FlatClientProperties.STYLE, "focusedBorderColor: #ab0a6b");
         usernameField.setForeground(Color.WHITE);
@@ -87,7 +88,7 @@ public class RegisterPanel extends JPanel {
         backgroundCard.add(password);
         backgroundCard.add(Box.createVerticalStrut(6));
 
-        JPasswordField passwordField = new JPasswordField(20);
+        passwordField = new JPasswordField(20);
         passwordField.setEditable(true);
         passwordField.putClientProperty(FlatClientProperties.STYLE, "focusedBorderColor: #ab0a6b; showRevealButton: true");
         passwordField.setForeground(Color.WHITE);
@@ -110,6 +111,13 @@ public class RegisterPanel extends JPanel {
         backgroundCard.add(registerButton);
         backgroundCard.add(Box.createVerticalStrut(10));
 
+        registerErrorText = new JLabel();
+        registerErrorText.setForeground(Color.RED);
+        registerErrorText.setFont(username.getFont().deriveFont(Font.PLAIN));
+        registerErrorText.setVisible(false);
+        backgroundCard.add(registerErrorText);
+        backgroundCard.add(Box.createVerticalStrut(6));
+
         JLabel account = new JLabel("Already have an account?");
         account.setForeground(UIManager.getColor("Label.disabledForeground"));
         backgroundCard.add(account);
@@ -124,6 +132,24 @@ public class RegisterPanel extends JPanel {
         login.addActionListener(e -> showLogin.run());
         backgroundCard.add(login);
 
+        registerButton.addActionListener(e -> submit(authService));
+
         add(backgroundCard);
+    }
+
+    private void submit(AuthService authService){
+        String username = usernameField.getText().trim();
+        char[] password = passwordField.getPassword();
+        String email = emailField.getText();
+
+        authService.register(username, new String(password), email);
+    }
+
+    @Override
+    public void onRegisterFailed(String reason) {
+        SwingUtilities.invokeLater(() -> {
+            registerErrorText.setText(reason);
+            registerErrorText.setVisible(true);
+        });
     }
 }

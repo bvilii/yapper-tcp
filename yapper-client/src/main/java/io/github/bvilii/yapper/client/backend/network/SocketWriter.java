@@ -1,4 +1,4 @@
-package io.github.bvilii.yapper.client.backend;
+package io.github.bvilii.yapper.client.backend.network;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -18,9 +18,9 @@ public class SocketWriter implements Runnable {
     public void run() {
         while(true){
             try {
-                String message = messageQueue.take();
+                String line = messageQueue.take();
 
-                sendToServer(message);
+                send(line);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
 
@@ -28,9 +28,9 @@ public class SocketWriter implements Runnable {
         }
     }
 
-    private void sendToServer(String message) {
+    private void send(String line) {
         try {
-            bw.write(message);
+            bw.write(line);
             bw.write('\n');
             bw.flush();
         } catch (IOException e) {
@@ -38,7 +38,7 @@ public class SocketWriter implements Runnable {
         }
     }
 
-    public void addToQueue(String message){
-        messageQueue.offer(message);
+    public void addToQueue(String line){
+        messageQueue.offer(line);
     }
 }

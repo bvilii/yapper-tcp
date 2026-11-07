@@ -1,13 +1,16 @@
 package io.github.bvilii.yapper.client.frontend.chat;
 
+import io.github.bvilii.yapper.client.backend.service.room.RoomService;
+
 import javax.swing.*;
 import java.awt.*;
 
 public class ChatScreen extends JPanel {
 
-    public ChatScreen(){
+    public ChatScreen(RoomService roomService){
         setLayout(new BorderLayout());
-        RoomsPanel rooms = new RoomsPanel();
+        RoomsPanel rooms = new RoomsPanel(roomService);
+        roomService.addObserver(rooms);
         ChatPanel chat = new ChatPanel();
 
         JSplitPane splitView = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, rooms, chat);
