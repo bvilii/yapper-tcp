@@ -12,6 +12,7 @@ import io.github.bvilii.yapper.server.persistence.JdbcUserRepository;
 import io.github.bvilii.yapper.server.persistence.UserRepository;
 import io.github.bvilii.yapper.server.service.AuthService;
 import io.github.bvilii.yapper.server.service.ChatService;
+import io.github.bvilii.yapper.server.service.ClientRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,9 +25,9 @@ public class Main {
         ServerConfig config = ServerConfigFactory.load();
         HikariDataSource dataSource = DataSourceFactory.create(config);
         MessageCodec codec = new MessageCodec();
-
+        ClientRegistry registry = new ClientRegistry();
         UserRepository userRepository = new JdbcUserRepository(dataSource);
-        AuthService authService = new AuthService(userRepository, codec);
+        AuthService authService = new AuthService(userRepository, codec, registry);
         ChatService chatService = new ChatService();
 
         MessageController router = new MessageController(codec, chatService, authService);
