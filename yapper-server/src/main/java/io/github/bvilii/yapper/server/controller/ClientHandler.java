@@ -10,7 +10,7 @@ public class ClientHandler implements Runnable {
     private final Executor executor;
     private final ClientConnection connection;
     private final MessageController router;
-    private User user;
+    private volatile User user;
 
     public ClientHandler(Executor executor, ClientConnection connection, MessageController router) {
         this.executor = executor;
@@ -47,5 +47,13 @@ public class ClientHandler implements Runnable {
 
     public void authenticate(User user){
         this.user = user;
+    }
+
+    public User getUser(){
+        return user;
+    }
+
+    public void logout(){
+        user = null;
     }
 }

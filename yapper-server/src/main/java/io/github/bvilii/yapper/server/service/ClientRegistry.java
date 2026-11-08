@@ -1,0 +1,23 @@
+package io.github.bvilii.yapper.server.service;
+
+import io.github.bvilii.yapper.server.controller.ClientHandler;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+
+public class ClientRegistry {
+    private final Map<Long, ClientHandler> registry;
+
+    public ClientRegistry() {
+        this.registry = new ConcurrentHashMap<>();
+    }
+
+    public Optional<ClientHandler> register(long userId, ClientHandler handler) {
+        return Optional.ofNullable(registry.put(userId, handler))
+                .filter(previous -> previous != handler);
+
+        //todo: previous.close();
+    }
+
+}
