@@ -3,10 +3,11 @@ package io.github.bvilii.yapper.server.persistence;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.time.Instant;
-import java.util.Optional;
+import java.util.*;
 
 public class JdbcUserRepository implements UserRepository {
     private static final String FIND_BY_USERNAME = "SELECT id, username, email, password_hash, created_at FROM users WHERE username = ?";
+    private static final String FIND_BY_USERNAMES_PREFIX = "SELECT id, username, email, password_hash, created_at FROM users WHERE username IN (";
     private static final String INSERT = "INSERT INTO users (username, email, password_hash, created_at) VALUES (?, ?, ?, ?)";
 
     private final DataSource dataSource;
@@ -29,6 +30,34 @@ public class JdbcUserRepository implements UserRepository {
             }
         } catch (SQLException e) {
             throw new IllegalStateException("Failed to find user: " + username, e);
+        }
+    }
+
+    @Override
+    public List<User> findByUsernames(Collection<String> usernames) {
+        if (usernames.isEmpty()) {
+            return List.of();
+        }
+
+        String placeholders = String.join(", ", Collections.nCopies(usernames.size(), "?"));
+        String sql = FIND_BY_USERNAMES_PREFIX + placeholders + ")";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            int index = 1;
+            for (String username : usernames) {
+                statement.setString(index++, username);
+            }
+
+            List<User> users = new ArrayList<>();
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    users.add(mapUser(rs));
+                }
+            }
+            return users;
+        } catch (SQLException e) {
+            throw new IllegalStateException("Failed to find users: " + usernames, e);
         }
     }
 
