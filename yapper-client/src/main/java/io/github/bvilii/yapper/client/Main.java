@@ -39,6 +39,7 @@ public class Main {
 
             FlatInterFont.install();
             FlatLaf.setPreferredFontFamily(FlatInterFont.FAMILY);
+            FlatLaf.registerCustomDefaultsSource("io.github.bvilii.yapper.client.themes");
             FlatLaf.setup(new FlatMacDarkLaf() {
                 @Override
                 public void provideErrorFeedback(Component component) {

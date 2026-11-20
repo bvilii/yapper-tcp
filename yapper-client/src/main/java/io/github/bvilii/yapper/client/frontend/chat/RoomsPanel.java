@@ -1,6 +1,7 @@
 package io.github.bvilii.yapper.client.frontend.chat;
 
 import com.formdev.flatlaf.FlatClientProperties;
+import com.formdev.flatlaf.extras.FlatSVGIcon;
 import io.github.bvilii.yapper.client.backend.service.room.RoomObserver;
 import io.github.bvilii.yapper.client.backend.service.room.RoomService;
 import io.github.bvilii.yapper.common.model.RoomInfo;
@@ -43,10 +44,14 @@ public class RoomsPanel extends JPanel implements RoomObserver {
 
         roomList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         roomList.setCellRenderer(new RoomCellRenderer());
-        roomList.setSelectionBackground(new Color(0xab0a6b));
-        roomList.setSelectionForeground(Color.WHITE);
-        roomList.setBackground(new Color(0xFF252525, true));
+        roomList.putClientProperty(FlatClientProperties.STYLE,
+                "background: @yapperSurface; "
+                        + "selectionBackground: @accentColor; selectionForeground: @yapperOnAccent; "
+                        + "selectionInactiveBackground: @accentColor; selectionInactiveForeground: @yapperOnAccent");
+        putClientProperty(FlatClientProperties.STYLE, "background: @yapperSurface");
         setMinimumSize(new Dimension(270, 0));
+
+        roomList.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0));
 
         JScrollPane scroll = new JScrollPane(roomList);
         scroll.setBorder(BorderFactory.createEmptyBorder());
@@ -58,25 +63,37 @@ public class RoomsPanel extends JPanel implements RoomObserver {
     private JPanel createHeader() {
         JPanel header = new JPanel(new BorderLayout());
         header.setOpaque(false);
-        header.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 8));
+        header.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 12));
+        header.setPreferredSize(new Dimension(0, ChatPanel.HEADER_HEIGHT));
 
         JLabel title = new JLabel("Yaps");
-        title.putClientProperty(FlatClientProperties.STYLE_CLASS, "h4");
+        title.putClientProperty(FlatClientProperties.STYLE_CLASS, "h2");
+        title.putClientProperty(FlatClientProperties.STYLE, "foreground: @yapperHighlight");
         header.add(title, BorderLayout.WEST);
 
-        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
+        JPanel actions = new JPanel(new GridBagLayout());
         actions.setOpaque(false);
 
-        JButton addButton = new JButton("+");
+        FlatSVGIcon addIcon = new FlatSVGIcon("icons/add.svg", 16, 16);
+        addIcon.setColorFilter(new FlatSVGIcon.ColorFilter(color -> UIManager.getColor("Yapper.highlight")));
+
+        JButton addButton = new JButton(addIcon);
         addButton.putClientProperty(FlatClientProperties.BUTTON_TYPE,
                 FlatClientProperties.BUTTON_TYPE_TOOLBAR_BUTTON);
-        addButton.setFont(addButton.getFont().deriveFont(Font.BOLD, 18f));
+        addButton.putClientProperty(FlatClientProperties.STYLE, "arc: 999");
+        addButton.setMargin(new Insets(0, 0, 0, 0));
+        addButton.setPreferredSize(new Dimension(34, 34));
         addButton.setToolTipText("New chat");
         addButton.addActionListener(e -> openCreateRoomDialog());
         actions.add(addButton);
 
         header.add(actions, BorderLayout.EAST);
-        return header;
+
+        JPanel headerWithLine = new JPanel(new BorderLayout());
+        headerWithLine.setOpaque(false);
+        headerWithLine.add(header, BorderLayout.CENTER);
+        headerWithLine.add(new JSeparator(), BorderLayout.SOUTH);
+        return headerWithLine;
     }
 
     private void openCreateRoomDialog() {

@@ -29,7 +29,7 @@ public class LoadingPanel extends JPanel {
 
         JProgressBar bar = new JProgressBar(0, 100);
         bar.setValue(45);
-        bar.putClientProperty(FlatClientProperties.STYLE, "arc: 999; foreground: #32D74B");
+        bar.putClientProperty(FlatClientProperties.STYLE, "arc: 999; foreground: @yapperHighlight");
         Dimension barSize = new Dimension(390, 10);
         bar.setPreferredSize(barSize);
         bar.setMaximumSize(barSize);

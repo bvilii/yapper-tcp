@@ -1,5 +1,6 @@
 package io.github.bvilii.yapper.client.frontend.chat;
 
+import com.formdev.flatlaf.FlatClientProperties;
 import io.github.bvilii.yapper.client.backend.service.room.RoomObserver;
 import io.github.bvilii.yapper.client.backend.service.room.RoomService;
 import io.github.bvilii.yapper.common.model.RoomInfo;
@@ -37,8 +38,12 @@ public class CreateRoomDialog extends JDialog implements RoomObserver {
         usernamesLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         usernamesField.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        errorLabel.setForeground(Color.RED);
+        errorLabel.putClientProperty(FlatClientProperties.STYLE, "foreground: @yapperError");
         errorLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        createButton.putClientProperty(FlatClientProperties.STYLE,
+                "background: @accentColor; foreground: @yapperOnAccent; "
+                        + "disabledBackground: darken(@accentColor,8%); disabledText: fade(@yapperOnAccent,70%)");
 
         JButton cancelButton = new JButton("Cancel");
         cancelButton.addActionListener(e -> dispose());
