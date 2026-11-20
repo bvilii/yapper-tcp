@@ -8,14 +8,18 @@ import io.github.bvilii.yapper.common.model.RoomInfo;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.util.List;
+import java.util.function.Consumer;
 
 public class RoomsPanel extends JPanel implements RoomObserver {
     private final RoomService roomService;
     private final DefaultListModel<RoomInfo> model = new DefaultListModel<>();
     private final JList<RoomInfo> roomList;
+    private final Consumer<RoomInfo> onRoomSelected;
 
-    public RoomsPanel(RoomService roomService) {
+    public RoomsPanel(RoomService roomService, Consumer<RoomInfo> onRoomSelected) {
         this.roomService = roomService;
+        this.onRoomSelected = onRoomSelected;
         setLayout(new BorderLayout());
 
         roomList = new JList<>(model) {
@@ -26,6 +30,16 @@ public class RoomsPanel extends JPanel implements RoomObserver {
                 }
             }
         };
+
+        roomList.addListSelectionListener(e -> {
+            if (e.getValueIsAdjusting()) {
+                return;
+            }
+            RoomInfo selected = roomList.getSelectedValue();
+            if (selected != null) {
+                onRoomSelected.accept(selected);
+            }
+        });
 
         roomList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         roomList.setCellRenderer(new RoomCellRenderer());
@@ -76,6 +90,14 @@ public class RoomsPanel extends JPanel implements RoomObserver {
         SwingUtilities.invokeLater(() -> {
             model.addElement(room);
             roomList.setSelectedValue(room, true);
+        });
+    }
+
+    @Override
+    public void onRoomsLoaded(List<RoomInfo> rooms) {
+        SwingUtilities.invokeLater(() -> {
+            model.clear();
+            model.addAll(rooms);
         });
     }
 }

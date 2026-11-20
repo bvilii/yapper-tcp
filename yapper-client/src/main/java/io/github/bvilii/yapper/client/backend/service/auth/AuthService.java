@@ -16,10 +16,12 @@ public class AuthService implements AuthSubject {
     private final List<AuthObserver> observers = new CopyOnWriteArrayList<>();
     private final ServerConnection connection;
     private final MessageCodec codec;
+    private final Session session;
 
-    public AuthService(ServerConnection connection, MessageCodec codec) {
+    public AuthService(ServerConnection connection, MessageCodec codec, Session session) {
         this.connection = connection;
         this.codec = codec;
+        this.session = session;
     }
 
     @Override
@@ -28,25 +30,27 @@ public class AuthService implements AuthSubject {
     }
 
     public void handleRegisterSuccess(RegisterOk message) {
-        for(AuthObserver observer : observers){
+        session.start(message.username());
+        for (AuthObserver observer : observers) {
             observer.onRegisterSuccess(message.username());
         }
     }
 
     public void handleRegisterFailure(RegisterFailed message) {
-        for(AuthObserver observer : observers){
+        for (AuthObserver observer : observers) {
             observer.onRegisterFailed(message.reason());
         }
     }
 
     public void handleLoginFailure(LoginFailed message) {
-        for(AuthObserver observer : observers){
+        for (AuthObserver observer : observers) {
             observer.onLoginFailed(message.reason());
         }
     }
 
     public void handleLoginSuccess(LoginOk message) {
-        for(AuthObserver observer : observers){
+        session.start(message.username());
+        for (AuthObserver observer : observers) {
             observer.onLoginSuccess(message.username());
         }
     }

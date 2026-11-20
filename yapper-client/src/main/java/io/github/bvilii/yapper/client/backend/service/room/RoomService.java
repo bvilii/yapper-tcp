@@ -1,15 +1,18 @@
 package io.github.bvilii.yapper.client.backend.service.room;
 
 import io.github.bvilii.yapper.client.backend.network.ServerConnection;
+import io.github.bvilii.yapper.client.backend.service.auth.AuthObserver;
 import io.github.bvilii.yapper.common.message.MessageCodec;
 import io.github.bvilii.yapper.common.message.client.CreateRoomRequest;
+import io.github.bvilii.yapper.common.message.client.RoomListRequest;
 import io.github.bvilii.yapper.common.message.server.CreateRoomFailed;
 import io.github.bvilii.yapper.common.message.server.RoomCreated;
+import io.github.bvilii.yapper.common.message.server.RoomList;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class RoomService implements RoomSubject {
+public class RoomService implements RoomSubject, AuthObserver {
     private final MessageCodec codec;
     private final ServerConnection connection;
     private final List<RoomObserver> observers = new CopyOnWriteArrayList<>();
@@ -23,6 +26,10 @@ public class RoomService implements RoomSubject {
         connection.writeToServer(codec.encode(new CreateRoomRequest(roomName, usernames)));
     }
 
+    public void requestRoomList() {
+        connection.writeToServer(codec.encode(new RoomListRequest()));
+    }
+
     @Override
     public void addObserver(RoomObserver observer) {
         observers.add(observer);
@@ -33,6 +40,15 @@ public class RoomService implements RoomSubject {
         observers.remove(observer);
     }
 
+    @Override
+    public void onLoginSuccess(String username) {
+        requestRoomList();
+    }
+
+    @Override
+    public void onRegisterSuccess(String username) {
+        requestRoomList();
+    }
 
     public void handleRoomCreated(RoomCreated message) {
         for (RoomObserver observer : observers) {
@@ -43,6 +59,12 @@ public class RoomService implements RoomSubject {
     public void handleCreateRoomFailed(CreateRoomFailed message) {
         for (RoomObserver observer : observers) {
             observer.onCreateRoomFailed(message.reason());
+        }
+    }
+
+    public void handleRoomList(RoomList message) {
+        for (RoomObserver observer : observers) {
+            observer.onRoomsLoaded(message.rooms());
         }
     }
 }
