@@ -55,30 +55,14 @@ public class MainWindow implements AuthObserver {
 
 
         menuBar.add(createSettingsMenu());
+        menuBar.add(createViewMenu());
         menuBar.add(createHelpMenu());
 
         frame.setJMenuBar(menuBar);
     }
 
-    private JMenu createHelpMenu() {
-        JMenu menu = new JMenu("Help");
-
-
-        JMenuItem shortcuts = new JMenuItem("Keyboard shortcuts");
-
-        menu.add(shortcuts);
-
-        return menu;
-    }
-
-    private JMenu createSettingsMenu() {
-        JMenu menu = new JMenu("Settings");
-
-        // --- Profile ---
-        JMenuItem profile = new JMenuItem("Profile");
-        profile.addActionListener(e -> {
-            // TODO: profil képernyő megnyitása
-        });
+    private JMenu createViewMenu(){
+        JMenu menu = new JMenu("View");
 
         // --- Theme almenü ---
         JMenu theme = new JMenu("Theme");
@@ -102,17 +86,29 @@ public class MainWindow implements AuthObserver {
         theme.add(lightTheme);
         theme.add(darkTheme);
 
+        menu.add(theme);
+        return menu;
+    }
+
+    private JMenu createHelpMenu() {
+        JMenu menu = new JMenu("Help");
+        menu.setEnabled(false);
+
+        return menu;
+    }
+
+    private JMenu createSettingsMenu() {
+        JMenu menu = new JMenu("Settings");
+
         // --- Log out ---
         JMenuItem logout = new JMenuItem("Log out");
+        logout.setEnabled(false);
         logout.addActionListener(e -> logout());
 
         // --- Exit ---
         JMenuItem exit = new JMenuItem("Exit");
         exit.addActionListener(e -> System.exit(0));
 
-        menu.add(profile);
-        menu.add(theme);
-        menu.addSeparator(); // elválasztó vonal
         menu.add(logout);
         menu.add(exit);
         return menu;
