@@ -1,6 +1,7 @@
 package io.github.bvilii.yapper.client.backend.controller;
 
 import io.github.bvilii.yapper.client.backend.service.auth.AuthService;
+import io.github.bvilii.yapper.client.backend.service.chat.ChatService;
 import io.github.bvilii.yapper.client.backend.service.room.RoomService;
 import io.github.bvilii.yapper.common.message.InvalidMessageException;
 import io.github.bvilii.yapper.common.message.MessageCodec;
@@ -10,11 +11,13 @@ public class MessageController {
     private final MessageCodec codec;
     private final AuthService authService;
     private final RoomService roomService;
+    private final ChatService chatService;
 
-    public MessageController(MessageCodec codec, AuthService authService, RoomService roomService) {
+    public MessageController(MessageCodec codec, AuthService authService, RoomService roomService, ChatService chatService) {
         this.codec = codec;
         this.authService = authService;
         this.roomService = roomService;
+        this.chatService = chatService;
     }
 
     public void handleMessage(String line) {
@@ -32,10 +35,10 @@ public class MessageController {
             case LoginOk m -> authService.handleLoginSuccess(m);
             case CreateRoomFailed m -> roomService.handleCreateRoomFailed(m);
             case RoomCreated m -> roomService.handleRoomCreated(m);
-
-            case ChatMessage chatMessage -> {
-            }
-            case ErrorMessage errorMessage -> {
+            case RoomList m -> roomService.handleRoomList(m);
+            case RoomHistory m -> chatService.handleRoomHistory(m);
+            case ChatMessage m -> chatService.handleChatArrived(m);
+            case ErrorMessage m -> {
             }
         }
     }

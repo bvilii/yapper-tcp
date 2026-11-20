@@ -7,6 +7,8 @@ import io.github.bvilii.yapper.client.backend.controller.ClientController;
 import io.github.bvilii.yapper.client.backend.controller.MessageController;
 import io.github.bvilii.yapper.client.backend.network.ServerConnection;
 import io.github.bvilii.yapper.client.backend.service.auth.AuthService;
+import io.github.bvilii.yapper.client.backend.service.auth.Session;
+import io.github.bvilii.yapper.client.backend.service.chat.ChatService;
 import io.github.bvilii.yapper.client.backend.service.room.RoomService;
 import io.github.bvilii.yapper.client.frontend.MainWindow;
 import io.github.bvilii.yapper.common.message.MessageCodec;
@@ -23,10 +25,13 @@ public class Main {
 
 
         MessageCodec codec = new MessageCodec();
+        Session session = new Session();
         ServerConnection connection = new ServerConnection(executor);
-        AuthService authService = new AuthService(connection, codec);
+        AuthService authService = new AuthService(connection, codec, session);
         RoomService roomService = new RoomService(codec, connection);
-        MessageController router = new MessageController(codec, authService, roomService);
+        authService.addObserver(roomService);
+        ChatService chatService = new ChatService(codec, connection);
+        MessageController router = new MessageController(codec, authService, roomService, chatService);
         ClientController controller = new ClientController(connection, router);
 
 
@@ -49,7 +54,7 @@ public class Main {
             UIManager.put("List.selectionArc", 12);
             UIManager.put("List.selectionInsets", new Insets(2, 6, 2, 6));
 
-            MainWindow window = new MainWindow(authService, roomService);
+            MainWindow window = new MainWindow(authService, roomService, chatService, session);
             authService.addObserver(window);
             window.show();
         });

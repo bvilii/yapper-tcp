@@ -8,10 +8,14 @@ import javax.swing.*;
 import java.awt.*;
 
 public class RegisterPanel extends JPanel implements AuthObserver {
+    private static final String REGISTER_TEXT = "Register";
+    private static final String PENDING_TEXT = "Creating account…";
+
     private final JLabel registerErrorText;
     private final JTextField usernameField;
     private final JPasswordField passwordField;
     private final JTextField emailField;
+    private final JButton registerButton;
 
     public RegisterPanel(AuthService authService, Runnable showLogin) {
         // RegisterPanel configurations
@@ -101,7 +105,9 @@ public class RegisterPanel extends JPanel implements AuthObserver {
         backgroundCard.add(passwordField);
         backgroundCard.add(Box.createVerticalStrut(20));
 
-        JButton registerButton = new JButton("Register");
+        registerButton = new JButton(REGISTER_TEXT);
+        registerButton.putClientProperty(FlatClientProperties.STYLE,
+                "disabledBackground: darken(#ab0a6b,12%); disabledText: #e0e0e0");
         registerButton.setMargin(new Insets(10, 10, 10, 10));
         registerButton.setForeground(Color.WHITE);
         registerButton.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -137,19 +143,44 @@ public class RegisterPanel extends JPanel implements AuthObserver {
         add(backgroundCard);
     }
 
-    private void submit(AuthService authService){
+    private void submit(AuthService authService) {
         String username = usernameField.getText().trim();
         char[] password = passwordField.getPassword();
-        String email = emailField.getText();
+        String email = emailField.getText().trim();
 
+        if (username.isEmpty() || password.length == 0 || email.isEmpty()) {
+            showError("Please fill in all fields");
+            return;
+        }
+
+        registerErrorText.setVisible(false);
+        setPending(true);
         authService.register(username, new String(password), email);
+    }
+
+    @Override
+    public void onRegisterSuccess(String username) {
+        SwingUtilities.invokeLater(() -> {
+            setPending(false);
+            passwordField.setText("");
+        });
     }
 
     @Override
     public void onRegisterFailed(String reason) {
         SwingUtilities.invokeLater(() -> {
-            registerErrorText.setText(reason);
-            registerErrorText.setVisible(true);
+            setPending(false);
+            showError(reason);
         });
+    }
+
+    private void setPending(boolean pending) {
+        registerButton.setEnabled(!pending);
+        registerButton.setText(pending ? PENDING_TEXT : REGISTER_TEXT);
+    }
+
+    private void showError(String message) {
+        registerErrorText.setText(message);
+        registerErrorText.setVisible(true);
     }
 }

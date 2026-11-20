@@ -2,6 +2,8 @@ package io.github.bvilii.yapper.client.frontend;
 
 import io.github.bvilii.yapper.client.backend.service.auth.AuthObserver;
 import io.github.bvilii.yapper.client.backend.service.auth.AuthService;
+import io.github.bvilii.yapper.client.backend.service.auth.Session;
+import io.github.bvilii.yapper.client.backend.service.chat.ChatService;
 import io.github.bvilii.yapper.client.backend.service.room.RoomService;
 import io.github.bvilii.yapper.client.frontend.auth.AuthScreen;
 import io.github.bvilii.yapper.client.frontend.chat.ChatScreen;
@@ -17,9 +19,10 @@ public class MainWindow implements AuthObserver {
     private final CardLayout cards = new CardLayout();
     private final JPanel root = new JPanel(cards);
 
-    public MainWindow(AuthService authService, RoomService roomService) {
+    public MainWindow(AuthService authService, RoomService roomService,
+                      ChatService chatService, Session session) {
         root.add(new AuthScreen(authService), AUTH);
-        root.add(new ChatScreen(roomService), CHAT);
+        root.add(new ChatScreen(roomService, chatService, session), CHAT);
 
         frame.setContentPane(root);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

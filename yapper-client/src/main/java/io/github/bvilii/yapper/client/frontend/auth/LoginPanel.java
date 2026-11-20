@@ -8,9 +8,13 @@ import javax.swing.*;
 import java.awt.*;
 
 public class LoginPanel extends JPanel implements AuthObserver {
+    private static final String LOGIN_TEXT = "Log in";
+    private static final String PENDING_TEXT = "Logging in…";
+
     private final JLabel loginErrorText;
     private final JTextField usernameField;
     private final JPasswordField passwordField;
+    private final JButton loginButton;
 
     public LoginPanel(AuthService authService, Runnable showRegister) {
         // LoginPanel configurations
@@ -81,7 +85,9 @@ public class LoginPanel extends JPanel implements AuthObserver {
         backgroundCard.add(passwordField);
         backgroundCard.add(Box.createVerticalStrut(20));
 
-        JButton loginButton = new JButton("Log in");
+        loginButton = new JButton(LOGIN_TEXT);
+        loginButton.putClientProperty(FlatClientProperties.STYLE,
+                "disabledBackground: darken(#ab0a6b,12%); disabledText: #e0e0e0");
         loginButton.setMargin(new Insets(10, 10, 10, 10));
         loginButton.setForeground(Color.WHITE);
         loginButton.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -117,18 +123,45 @@ public class LoginPanel extends JPanel implements AuthObserver {
         add(backgroundCard);
     }
 
-    private void submit(AuthService authService){
+    private void submit(AuthService authService) {
         String username = usernameField.getText().trim();
         char[] password = passwordField.getPassword();
 
+        if (username.isEmpty() || password.length == 0) {
+            showError("Please fill in all fields");
+            return;
+        }
+
+        loginErrorText.setVisible(false);
+        setPending(true);
         authService.login(username, new String(password));
     }
 
     @Override
-    public void onLoginFailed(String reason){
+    public void onLoginSuccess(String username) {
         SwingUtilities.invokeLater(() -> {
-            loginErrorText.setText(reason);
-            loginErrorText.setVisible(true);
+            setPending(false);
+            passwordField.setText("");
         });
+    }
+
+    @Override
+    public void onLoginFailed(String reason) {
+        SwingUtilities.invokeLater(() -> {
+            setPending(false);
+            passwordField.setText("");
+            showError(reason);
+            passwordField.requestFocusInWindow();
+        });
+    }
+
+    private void setPending(boolean pending) {
+        loginButton.setEnabled(!pending);
+        loginButton.setText(pending ? PENDING_TEXT : LOGIN_TEXT);
+    }
+
+    private void showError(String message) {
+        loginErrorText.setText(message);
+        loginErrorText.setVisible(true);
     }
 }
