@@ -2,8 +2,7 @@ package io.github.bvilii.yapper.server.service;
 
 import io.github.bvilii.yapper.server.controller.ClientHandler;
 
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ClientRegistry {
@@ -20,4 +19,10 @@ public class ClientRegistry {
         //todo: previous.close();
     }
 
+    public List<ClientHandler> getOnlineClients(Collection<Long> userIds) {
+        return userIds.stream()
+                .map(registry::get)
+                .filter(Objects::nonNull)
+                .toList();
+    }
 }
