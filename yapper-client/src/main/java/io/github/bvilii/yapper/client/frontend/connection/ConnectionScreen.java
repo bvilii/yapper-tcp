@@ -14,14 +14,14 @@ public class ConnectionScreen extends JPanel {
         //card shaped background panel for the content
         JPanel backgroundCard = new JPanel();
         backgroundCard.setLayout(new BoxLayout(backgroundCard, BoxLayout.Y_AXIS));
-        backgroundCard.putClientProperty(FlatClientProperties.STYLE, "arc: 24; background: #010736");
+        backgroundCard.putClientProperty(FlatClientProperties.STYLE, "arc: 24; background: @yapperSurface");
         backgroundCard.setBorder(BorderFactory.createEmptyBorder(32, 32, 32, 32));
 
 
         //fill the card with content
         JLabel connectionLostLabel = new JLabel("CONNECTION LOST");
         connectionLostLabel.putClientProperty(FlatClientProperties.STYLE_CLASS, "h0");
-        connectionLostLabel.setForeground(new Color(0xFCF1D0));
+        connectionLostLabel.putClientProperty(FlatClientProperties.STYLE, "foreground: @yapperHighlight");
         connectionLostLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         backgroundCard.add(connectionLostLabel);
         backgroundCard.add(Box.createVerticalStrut(10));
@@ -30,7 +30,6 @@ public class ConnectionScreen extends JPanel {
 
         JLabel tryAgainLabel = new JLabel("Try to reconnect to yapper");
         tryAgainLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        tryAgainLabel.setForeground(new Color(0xFCF1D0));
         backgroundCard.add(tryAgainLabel);
         backgroundCard.add(Box.createVerticalStrut(10));
 
@@ -38,10 +37,10 @@ public class ConnectionScreen extends JPanel {
 
         JButton reconnectButton = new JButton("RECONNECT");
         reconnectButton.setMargin(new Insets(10, 10, 10, 10));
-        reconnectButton.setForeground(new Color(0xFCF1D0));
+        reconnectButton.putClientProperty(FlatClientProperties.STYLE,
+                "background: @accentColor; foreground: @yapperOnAccent");
         reconnectButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         reconnectButton.putClientProperty(FlatClientProperties.STYLE_CLASS, "large");
-        reconnectButton.setBackground(new Color(0x22396F));
         reconnectButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, reconnectButton.getPreferredSize().height));
         backgroundCard.add(reconnectButton);
         backgroundCard.add(Box.createVerticalStrut(30));
