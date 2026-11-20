@@ -1,4 +1,6 @@
 package io.github.bvilii.yapper.common.message.server;
 
-public record ChatMessage(long roomId, String sender, String text, long sentAt) implements ServerMessage {
+import io.github.bvilii.yapper.common.model.MessageInfo;
+
+public record ChatMessage(MessageInfo message) implements ServerMessage {
 }
