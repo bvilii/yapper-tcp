@@ -28,6 +28,7 @@ public class ChatPanel extends JPanel implements ChatObserver, AuthObserver {
     public ChatPanel(ChatService chatService, Session session) {
         this.chatService = chatService;
         setLayout(new BorderLayout());
+        putClientProperty(FlatClientProperties.STYLE, "background: @yapperChat");
 
         // NORTH: room name + members, with a line under it
         roomTitle.putClientProperty(FlatClientProperties.STYLE_CLASS, "h3");
@@ -60,7 +61,7 @@ public class ChatPanel extends JPanel implements ChatObserver, AuthObserver {
         messageList = new JList<>(model);
         messageList.setCellRenderer(new MessageCellRenderer(session));
         messageList.setFocusable(false);
-        messageList.putClientProperty(FlatClientProperties.STYLE, "background: @background");
+        messageList.putClientProperty(FlatClientProperties.STYLE, "background: @yapperChat");
         messageList.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
 
         JScrollPane scroll = new JScrollPane(messageList);
