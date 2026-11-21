@@ -66,4 +66,13 @@ public class AuthService {
                     previous.logout();
                 });
     }
+
+    public void handleLogout(ClientHandler sender) {
+        User user = sender.getUser();
+        if (user == null) {
+            return;
+        }
+        registry.unregister(user.id(), sender);
+        sender.logout();
+    }
 }

@@ -25,4 +25,8 @@ public class ClientRegistry {
                 .filter(Objects::nonNull)
                 .toList();
     }
+
+    public void unregister(long userId, ClientHandler handler){
+        registry.remove(userId, handler);
+    }
 }
