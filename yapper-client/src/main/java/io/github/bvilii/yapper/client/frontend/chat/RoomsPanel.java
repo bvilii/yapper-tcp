@@ -46,10 +46,10 @@ public class RoomsPanel extends JPanel implements RoomObserver, AuthObserver {
         roomList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         roomList.setCellRenderer(new RoomCellRenderer());
         roomList.putClientProperty(FlatClientProperties.STYLE,
-                "background: @yapperSurface; "
+                "background: @yapperSidebar; "
                         + "selectionBackground: @accentColor; selectionForeground: @yapperOnAccent; "
                         + "selectionInactiveBackground: @accentColor; selectionInactiveForeground: @yapperOnAccent");
-        putClientProperty(FlatClientProperties.STYLE, "background: @yapperSurface");
+        putClientProperty(FlatClientProperties.STYLE, "background: @yapperSidebar");
         setMinimumSize(new Dimension(270, 0));
 
         roomList.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0));
