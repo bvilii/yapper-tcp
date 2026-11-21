@@ -108,6 +108,8 @@ public class LoginPanel extends JPanel implements AuthObserver {
         backgroundCard.add(register);
 
         loginButton.addActionListener(e -> submit(authService));
+        usernameField.addActionListener(e -> passwordField.requestFocusInWindow());
+        passwordField.addActionListener(e -> loginButton.doClick());
 
         add(backgroundCard);
     }

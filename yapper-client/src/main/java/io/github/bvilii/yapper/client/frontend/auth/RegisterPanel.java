@@ -124,6 +124,9 @@ public class RegisterPanel extends JPanel implements AuthObserver {
         backgroundCard.add(login);
 
         registerButton.addActionListener(e -> submit(authService));
+        emailField.addActionListener(e -> usernameField.requestFocusInWindow());
+        usernameField.addActionListener(e -> passwordField.requestFocusInWindow());
+        passwordField.addActionListener(e -> registerButton.doClick());
 
         add(backgroundCard);
     }
