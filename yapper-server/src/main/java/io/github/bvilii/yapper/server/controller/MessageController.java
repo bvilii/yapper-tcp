@@ -51,6 +51,8 @@ public class MessageController {
             case CreateRoomRequest request -> roomService.handleRoomCreation(request, sender);
             case RoomListRequest request -> roomService.handleRoomListRequest(sender);
             case RoomHistoryRequest request -> chatService.handleRoomHistoryRequest(request, sender);
+            case Logout request -> {
+            }
         }
     }
 }

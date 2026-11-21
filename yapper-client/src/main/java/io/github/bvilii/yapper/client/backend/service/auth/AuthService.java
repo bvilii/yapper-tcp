@@ -3,6 +3,7 @@ package io.github.bvilii.yapper.client.backend.service.auth;
 import io.github.bvilii.yapper.client.backend.network.ServerConnection;
 import io.github.bvilii.yapper.common.message.MessageCodec;
 import io.github.bvilii.yapper.common.message.client.LoginRequest;
+import io.github.bvilii.yapper.common.message.client.Logout;
 import io.github.bvilii.yapper.common.message.client.RegisterRequest;
 import io.github.bvilii.yapper.common.message.server.LoginFailed;
 import io.github.bvilii.yapper.common.message.server.LoginOk;
@@ -61,5 +62,13 @@ public class AuthService implements AuthSubject {
 
     public void register(String username, String password, String email) {
         connection.writeToServer(codec.encode(new RegisterRequest(username, password, email)));
+    }
+
+    public void logout() {
+        connection.writeToServer(codec.encode(new Logout()));
+        session.clear();
+        for (AuthObserver observer : observers) {
+            observer.onLoggedOut();
+        }
     }
 }

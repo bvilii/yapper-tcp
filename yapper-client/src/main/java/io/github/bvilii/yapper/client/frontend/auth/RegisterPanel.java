@@ -168,4 +168,15 @@ public class RegisterPanel extends JPanel implements AuthObserver {
         registerErrorText.setText(message);
         registerErrorText.setVisible(true);
     }
+
+    @Override
+    public void onLoggedOut(){
+        SwingUtilities.invokeLater(() -> {
+            emailField.setText("");
+            usernameField.setText("");
+            passwordField.setText("");
+            registerErrorText.setVisible(false);
+            setPending(false);
+        });
+    }
 }

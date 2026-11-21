@@ -153,4 +153,14 @@ public class LoginPanel extends JPanel implements AuthObserver {
         loginErrorText.setText(message);
         loginErrorText.setVisible(true);
     }
+
+    @Override
+    public void onLoggedOut(){
+        SwingUtilities.invokeLater(() -> {
+            usernameField.setText("");
+            passwordField.setText("");
+            loginErrorText.setVisible(false);
+            setPending(false);
+        });
+    }
 }
