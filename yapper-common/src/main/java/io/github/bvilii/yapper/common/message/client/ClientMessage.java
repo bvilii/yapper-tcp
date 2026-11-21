@@ -11,8 +11,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value = SendChat.class, name = "CHAT"),
         @JsonSubTypes.Type(value = CreateRoomRequest.class, name = "CREATE_ROOM"),
         @JsonSubTypes.Type(value = RoomListRequest.class, name = "ROOM_LIST_REQUEST"),
-        @JsonSubTypes.Type(value = RoomHistoryRequest.class, name = "ROOM_HISTORY_REQUEST")
+        @JsonSubTypes.Type(value = RoomHistoryRequest.class, name = "ROOM_HISTORY_REQUEST"),
+        @JsonSubTypes.Type(value = Logout.class, name = "LOGOUT")
 })
 public sealed interface ClientMessage
-        permits CreateRoomRequest, LoginRequest, RegisterRequest, RoomHistoryRequest, RoomListRequest, SendChat, TokenLoginRequest {
+        permits CreateRoomRequest, LoginRequest, Logout, RegisterRequest, RoomHistoryRequest, RoomListRequest, SendChat, TokenLoginRequest {
 }

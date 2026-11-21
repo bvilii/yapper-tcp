@@ -22,10 +22,16 @@ public class MainWindow implements AuthObserver {
     private final CardLayout cards = new CardLayout();
     private final JPanel root = new JPanel(cards);
 
+    private final AuthService authService;
+
+    private JMenuItem logout;
+
     public MainWindow(AuthService authService, RoomService roomService,
                       ChatService chatService, Session session) {
+
+        this.authService = authService;
         root.add(new AuthScreen(authService), AUTH);
-        root.add(new ChatScreen(roomService, chatService, session), CHAT);
+        root.add(new ChatScreen(roomService, chatService, authService, session), CHAT);
 
         createMenubar();
 
@@ -42,12 +48,18 @@ public class MainWindow implements AuthObserver {
 
     @Override
     public void onLoginSuccess(String username) {
-        SwingUtilities.invokeLater(() -> cards.show(root, CHAT));
+        SwingUtilities.invokeLater(() -> {
+            cards.show(root, CHAT);
+            logout.setEnabled(true);
+        });
     }
 
     @Override
     public void onRegisterSuccess(String username) {
-        SwingUtilities.invokeLater(() -> cards.show(root, CHAT));
+        SwingUtilities.invokeLater(() -> {
+            cards.show(root, CHAT);
+            logout.setEnabled(true);
+        });
     }
 
     private void createMenubar() {
@@ -101,7 +113,7 @@ public class MainWindow implements AuthObserver {
         JMenu menu = new JMenu("Settings");
 
         // --- Log out ---
-        JMenuItem logout = new JMenuItem("Log out");
+        logout = new JMenuItem("Log out");
         logout.setEnabled(false);
         logout.addActionListener(e -> logout());
 
@@ -124,7 +136,14 @@ public class MainWindow implements AuthObserver {
     }
 
     private void logout() {
-        // TODO: ide jön a backend kijelentkeztetés, pl. authService.logout();
-        cards.show(root, AUTH);
+        authService.logout();
+    }
+
+    @Override
+    public void onLoggedOut(){
+        SwingUtilities.invokeLater(() -> {
+            cards.show(root, AUTH);
+            logout.setEnabled(false);
+        });
     }
 }

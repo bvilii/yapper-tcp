@@ -1,6 +1,7 @@
 package io.github.bvilii.yapper.client.frontend.chat;
 
 import com.formdev.flatlaf.FlatClientProperties;
+import io.github.bvilii.yapper.client.backend.service.auth.AuthObserver;
 import io.github.bvilii.yapper.client.backend.service.auth.Session;
 import io.github.bvilii.yapper.client.backend.service.chat.ChatObserver;
 import io.github.bvilii.yapper.client.backend.service.chat.ChatService;
@@ -11,7 +12,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
-public class ChatPanel extends JPanel implements ChatObserver {
+public class ChatPanel extends JPanel implements ChatObserver, AuthObserver {
     static final int HEADER_HEIGHT = 64;
 
     private final ChatService chatService;
@@ -142,5 +143,17 @@ public class ChatPanel extends JPanel implements ChatObserver {
     private void setInputEnabled(boolean enabled) {
         inputField.setEnabled(enabled);
         sendButton.setEnabled(enabled);
+    }
+
+    @Override
+    public void onLoggedOut(){
+        SwingUtilities.invokeLater(() -> {
+            currentRoom = null;
+            model.clear();
+            roomTitle.setText("Select a room");
+            roomMembers.setText(" ");
+            setInputEnabled(false);
+            inputField.setText("");
+        });
     }
 }

@@ -2,6 +2,7 @@ package io.github.bvilii.yapper.client.frontend.chat;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
+import io.github.bvilii.yapper.client.backend.service.auth.AuthObserver;
 import io.github.bvilii.yapper.client.backend.service.room.RoomObserver;
 import io.github.bvilii.yapper.client.backend.service.room.RoomService;
 import io.github.bvilii.yapper.common.model.RoomInfo;
@@ -12,7 +13,7 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class RoomsPanel extends JPanel implements RoomObserver {
+public class RoomsPanel extends JPanel implements RoomObserver, AuthObserver {
     private final RoomService roomService;
     private final DefaultListModel<RoomInfo> model = new DefaultListModel<>();
     private final JList<RoomInfo> roomList;
@@ -115,6 +116,13 @@ public class RoomsPanel extends JPanel implements RoomObserver {
         SwingUtilities.invokeLater(() -> {
             model.clear();
             model.addAll(rooms);
+        });
+    }
+
+    @Override
+    public void onLoggedOut(){
+        SwingUtilities.invokeLater(() -> {
+            model.clear();
         });
     }
 }
