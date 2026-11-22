@@ -30,13 +30,13 @@ public class CreateRoomDialog extends JDialog implements RoomObserver {
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
         content.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        JLabel roomNameLabel = new JLabel("Room name");
-        roomNameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        roomNameField.setAlignmentX(Component.LEFT_ALIGNMENT);
-
         JLabel usernamesLabel = new JLabel("Usernames (comma separated)");
         usernamesLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         usernamesField.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel roomNameLabel = new JLabel("Room name");
+        roomNameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        roomNameField.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         errorLabel.putClientProperty(FlatClientProperties.STYLE, "foreground: @yapperError");
         errorLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -54,13 +54,13 @@ public class CreateRoomDialog extends JDialog implements RoomObserver {
         buttons.add(cancelButton);
         buttons.add(createButton);
 
-        content.add(roomNameLabel);
-        content.add(Box.createVerticalStrut(6));
-        content.add(roomNameField);
-        content.add(Box.createVerticalStrut(12));
         content.add(usernamesLabel);
         content.add(Box.createVerticalStrut(6));
         content.add(usernamesField);
+        content.add(Box.createVerticalStrut(12));
+        content.add(roomNameLabel);
+        content.add(Box.createVerticalStrut(6));
+        content.add(roomNameField);
         content.add(Box.createVerticalStrut(6));
         content.add(errorLabel);
         content.add(Box.createVerticalStrut(12));
