@@ -1,7 +1,7 @@
 package io.github.bvilii.yapper.server.controller;
 
-import io.github.bvilii.yapper.server.network.ClientConnection;
-import io.github.bvilii.yapper.server.network.Server;
+import io.github.bvilii.yapper.server.network.client.ClientConnection;
+import io.github.bvilii.yapper.server.network.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +21,7 @@ public class ServerController {
         this.router = router;
     }
 
-    public void startServer() throws IOException {
+    public void startServer() throws Exception {
         server.open();
         acceptClientLoop();
     }
