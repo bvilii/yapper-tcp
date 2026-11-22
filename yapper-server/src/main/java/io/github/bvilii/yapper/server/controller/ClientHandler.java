@@ -1,6 +1,6 @@
 package io.github.bvilii.yapper.server.controller;
 
-import io.github.bvilii.yapper.server.network.ClientConnection;
+import io.github.bvilii.yapper.server.network.client.ClientConnection;
 import io.github.bvilii.yapper.server.persistence.User;
 
 import java.io.IOException;

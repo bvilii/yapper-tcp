@@ -13,8 +13,8 @@ public class ClientController {
         this.router = router;
     }
 
-    public void start() throws IOException {
-        connection.connect();
+    public void start() throws Exception {
+        connection.connectToServer();
         connection.startWriterThread();
         startReadingFromServerLoop();
     }

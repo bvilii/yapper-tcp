@@ -6,7 +6,7 @@ import io.github.bvilii.yapper.server.config.ServerConfig;
 import io.github.bvilii.yapper.server.config.ServerConfigFactory;
 import io.github.bvilii.yapper.server.controller.MessageController;
 import io.github.bvilii.yapper.server.controller.ServerController;
-import io.github.bvilii.yapper.server.network.Server;
+import io.github.bvilii.yapper.server.network.server.Server;
 import io.github.bvilii.yapper.server.persistence.*;
 import io.github.bvilii.yapper.server.service.AuthService;
 import io.github.bvilii.yapper.server.service.ChatService;
@@ -20,7 +20,7 @@ import java.io.IOException;
 public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         ServerConfig config = ServerConfigFactory.load();
         HikariDataSource dataSource = DataSourceFactory.create(config);
         MessageCodec codec = new MessageCodec();
