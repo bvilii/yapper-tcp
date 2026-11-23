@@ -2,13 +2,19 @@ package io.github.bvilii.yapper.server.service;
 
 import io.github.bvilii.yapper.common.message.MessageCodec;
 import io.github.bvilii.yapper.common.message.client.CreateRoomRequest;
+import io.github.bvilii.yapper.common.message.client.OpenDmRequest;
 import io.github.bvilii.yapper.common.message.server.CreateRoomFailed;
+import io.github.bvilii.yapper.common.message.server.DmOpened;
+import io.github.bvilii.yapper.common.message.server.OpenDmFailed;
 import io.github.bvilii.yapper.common.message.server.RoomCreated;
 import io.github.bvilii.yapper.common.message.server.RoomList;
 import io.github.bvilii.yapper.common.model.RoomInfo;
+import io.github.bvilii.yapper.common.model.RoomType;
 import io.github.bvilii.yapper.server.controller.ClientHandler;
+import io.github.bvilii.yapper.server.persistence.DirectRoomAlreadyExistsException;
 import io.github.bvilii.yapper.server.persistence.Room;
 import io.github.bvilii.yapper.server.persistence.RoomRepository;
+import io.github.bvilii.yapper.server.persistence.RoomWithMembers;
 import io.github.bvilii.yapper.server.persistence.User;
 import io.github.bvilii.yapper.server.persistence.UserRepository;
 
@@ -68,7 +74,7 @@ public class RoomService {
 
         Room room = roomRepository.create(name, creator.id(), memberIds);
 
-        RoomInfo info = new RoomInfo(room.id(), room.name(), memberNames);
+        RoomInfo info = new RoomInfo(room.id(), room.name(), room.type(), memberNames);
         String json = codec.encode(new RoomCreated(info));
         for (ClientHandler client : registry.getOnlineClients(memberIds)) {
             client.send(json);
@@ -82,7 +88,7 @@ public class RoomService {
         }
 
         List<RoomInfo> rooms = roomRepository.findByMemberId(user.id()).stream()
-                .map(found -> new RoomInfo(found.room().id(), found.room().name(), found.memberNames()))
+                .map(this::toRoomInfo)
                 .toList();
 
         sender.send(codec.encode(new RoomList(rooms)));
@@ -114,5 +120,64 @@ public class RoomService {
 
     private void fail(ClientHandler sender, String reason) {
         sender.send(codec.encode(new CreateRoomFailed(reason)));
+    }
+
+    public void handleOpenDm(OpenDmRequest message, ClientHandler sender) {
+        User me = sender.getUser();
+        if (me == null) {
+            return;
+        }
+
+        String username = message.username() == null ? "" : message.username().trim();
+        if (username.isEmpty()) {
+            failDm(sender, "Type a username");
+            return;
+        }
+        if (username.equalsIgnoreCase(me.username())) {
+            failDm(sender, "You can't start a chat with yourself");
+            return;
+        }
+
+        Optional<User> found = userRepository.findByUsername(username);
+        if (found.isEmpty()) {
+            failDm(sender, "User not found: " + username);
+            return;
+        }
+        User other = found.get();
+
+        // We already have a DM with this person: just open it
+        Optional<RoomWithMembers> existing = roomRepository.findDirectRoom(me.id(), other.id());
+        if (existing.isPresent()) {
+            sender.send(codec.encode(new DmOpened(toRoomInfo(existing.get()))));
+            return;
+        }
+
+        Room room;
+        try {
+            room = roomRepository.createDirect(me.id(), other.id());
+        } catch (DirectRoomAlreadyExistsException e) {
+            // The other person opened the same DM at the same moment: use that one
+            RoomWithMembers created = roomRepository.findDirectRoom(me.id(), other.id()).orElseThrow();
+            sender.send(codec.encode(new DmOpened(toRoomInfo(created))));
+            return;
+        }
+
+        RoomInfo info = new RoomInfo(room.id(), null, RoomType.DIRECT, List.of(me.username(), other.username()));
+        sender.send(codec.encode(new DmOpened(info)));
+
+        // For the other person this is a brand new room in their list
+        String roomCreated = codec.encode(new RoomCreated(info));
+        for (ClientHandler client : registry.getOnlineClients(List.of(other.id()))) {
+            client.send(roomCreated);
+        }
+    }
+
+    private RoomInfo toRoomInfo(RoomWithMembers found) {
+        Room room = found.room();
+        return new RoomInfo(room.id(), room.name(), room.type(), found.memberNames());
+    }
+
+    private void failDm(ClientHandler sender, String reason) {
+        sender.send(codec.encode(new OpenDmFailed(reason)));
     }
 }
