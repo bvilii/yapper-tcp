@@ -165,7 +165,7 @@ public class RoomService {
         RoomInfo info = new RoomInfo(room.id(), null, RoomType.DIRECT, List.of(me.username(), other.username()));
         sender.send(codec.encode(new DmOpened(info)));
 
-        // For the other person this is a brand new room in their list
+        // For the other person this is a brand-new room in their list
         String roomCreated = codec.encode(new RoomCreated(info));
         for (ClientHandler client : registry.getOnlineClients(List.of(other.id()))) {
             client.send(roomCreated);

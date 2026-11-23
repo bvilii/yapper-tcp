@@ -74,7 +74,7 @@ public class ServerConnection {
 
     static Socket connect() throws Exception {
         String host = System.getenv().getOrDefault("CHAT_HOST", "bvilii-yapper.duckdns.org");
-        int port = Integer.parseInt(System.getenv().getOrDefault("CHAT_PORT", "5000"));
+        int port = Integer.parseInt(System.getenv().getOrDefault("CHAT_PORT", "9099"));
 
         SSLSocket socket = (SSLSocket) createSocketFactory().createSocket(host, port);
 
