@@ -7,6 +7,7 @@ import io.github.bvilii.yapper.client.backend.service.chat.ChatObserver;
 import io.github.bvilii.yapper.client.backend.service.chat.ChatService;
 import io.github.bvilii.yapper.common.model.MessageInfo;
 import io.github.bvilii.yapper.common.model.RoomInfo;
+import io.github.bvilii.yapper.common.model.RoomType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,6 +17,7 @@ public class ChatPanel extends JPanel implements ChatObserver, AuthObserver {
     static final int HEADER_HEIGHT = 64;
 
     private final ChatService chatService;
+    private final Session session;
     private final DefaultListModel<MessageInfo> model = new DefaultListModel<>();
     private final JList<MessageInfo> messageList;
     private final JLabel roomTitle = new JLabel("Select a room");
@@ -27,6 +29,7 @@ public class ChatPanel extends JPanel implements ChatObserver, AuthObserver {
 
     public ChatPanel(ChatService chatService, Session session) {
         this.chatService = chatService;
+        this.session = session;
         setLayout(new BorderLayout());
         putClientProperty(FlatClientProperties.STYLE, "background: @yapperChat");
 
@@ -95,8 +98,12 @@ public class ChatPanel extends JPanel implements ChatObserver, AuthObserver {
 
     public void openRoom(RoomInfo room) {
         currentRoom = room;
-        roomTitle.setText(room.name());
-        roomMembers.setText(String.join(", ", room.members()));
+        roomTitle.setText(RoomTitle.of(room, session));
+        if (room.type() == RoomType.DIRECT) {
+            roomMembers.setText("Direct message");
+        } else {
+            roomMembers.setText(String.join(", ", room.members()));
+        }
         model.clear();
 
         chatService.requestRoomHistory(room.id());
