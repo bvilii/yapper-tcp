@@ -13,4 +13,10 @@ public interface RoomObserver {
 
     default void onRoomsLoaded(List<RoomInfo> rooms) {
     }
+
+    default void onDmOpened(RoomInfo room) {
+    }
+
+    default void onOpenDmFailed(String reason) {
+    }
 }

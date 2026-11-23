@@ -36,6 +36,8 @@ public class MessageController {
             case CreateRoomFailed m -> roomService.handleCreateRoomFailed(m);
             case RoomCreated m -> roomService.handleRoomCreated(m);
             case RoomList m -> roomService.handleRoomList(m);
+            case DmOpened m -> roomService.handleDmOpened(m);
+            case OpenDmFailed m -> roomService.handleOpenDmFailed(m);
             case RoomHistory m -> chatService.handleRoomHistory(m);
             case ChatMessage m -> chatService.handleChatArrived(m);
             case ErrorMessage m -> {

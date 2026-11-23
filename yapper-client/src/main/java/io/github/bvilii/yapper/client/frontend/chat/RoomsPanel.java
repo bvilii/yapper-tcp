@@ -3,6 +3,7 @@ package io.github.bvilii.yapper.client.frontend.chat;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import io.github.bvilii.yapper.client.backend.service.auth.AuthObserver;
+import io.github.bvilii.yapper.client.backend.service.auth.Session;
 import io.github.bvilii.yapper.client.backend.service.room.RoomObserver;
 import io.github.bvilii.yapper.client.backend.service.room.RoomService;
 import io.github.bvilii.yapper.common.model.RoomInfo;
@@ -19,7 +20,7 @@ public class RoomsPanel extends JPanel implements RoomObserver, AuthObserver {
     private final JList<RoomInfo> roomList;
     private final Consumer<RoomInfo> onRoomSelected;
 
-    public RoomsPanel(RoomService roomService, Consumer<RoomInfo> onRoomSelected) {
+    public RoomsPanel(RoomService roomService, Session session, Consumer<RoomInfo> onRoomSelected) {
         this.roomService = roomService;
         this.onRoomSelected = onRoomSelected;
         setLayout(new BorderLayout());
@@ -44,7 +45,7 @@ public class RoomsPanel extends JPanel implements RoomObserver, AuthObserver {
         });
 
         roomList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        roomList.setCellRenderer(new RoomCellRenderer());
+        roomList.setCellRenderer(new RoomCellRenderer(session));
         roomList.putClientProperty(FlatClientProperties.STYLE,
                 "background: @yapperSidebar; "
                         + "selectionBackground: @accentColor; selectionForeground: @yapperOnAccent; "
@@ -62,33 +63,20 @@ public class RoomsPanel extends JPanel implements RoomObserver, AuthObserver {
     }
 
     private JPanel createHeader() {
-        JPanel header = new JPanel(new BorderLayout());
-        header.setOpaque(false);
-        header.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 12));
-        header.setPreferredSize(new Dimension(0, ChatPanel.HEADER_HEIGHT));
-
-        JLabel title = new JLabel("Yaps");
-        title.putClientProperty(FlatClientProperties.STYLE_CLASS, "h2");
-        title.putClientProperty(FlatClientProperties.STYLE, "foreground: @yapperHighlight");
-        header.add(title, BorderLayout.WEST);
-
-        JPanel actions = new JPanel(new GridBagLayout());
+        // Two equal pill buttons side by side, vertically centered in a header as tall as the chat header
+        JPanel actions = new JPanel(new GridLayout(1, 2, 8, 0));
         actions.setOpaque(false);
+        actions.add(createActionButton("Room", "New group room", CreateRoomDialog.Mode.GROUP));
+        actions.add(createActionButton("DM", "New direct message", CreateRoomDialog.Mode.DIRECT));
 
-        FlatSVGIcon addIcon = new FlatSVGIcon("icons/add.svg", 16, 16);
-        addIcon.setColorFilter(new FlatSVGIcon.ColorFilter(color -> UIManager.getColor("Yapper.highlight")));
-
-        JButton addButton = new JButton(addIcon);
-        addButton.putClientProperty(FlatClientProperties.BUTTON_TYPE,
-                FlatClientProperties.BUTTON_TYPE_TOOLBAR_BUTTON);
-        addButton.putClientProperty(FlatClientProperties.STYLE, "arc: 999");
-        addButton.setMargin(new Insets(0, 0, 0, 0));
-        addButton.setPreferredSize(new Dimension(34, 34));
-        addButton.setToolTipText("New chat");
-        addButton.addActionListener(e -> openCreateRoomDialog());
-        actions.add(addButton);
-
-        header.add(actions, BorderLayout.EAST);
+        JPanel header = new JPanel(new GridBagLayout());
+        header.setOpaque(false);
+        header.setBorder(BorderFactory.createEmptyBorder(0, 12, 0, 12));
+        header.setPreferredSize(new Dimension(0, ChatPanel.HEADER_HEIGHT));
+        GridBagConstraints fill = new GridBagConstraints();
+        fill.fill = GridBagConstraints.HORIZONTAL;
+        fill.weightx = 1;
+        header.add(actions, fill);
 
         JPanel headerWithLine = new JPanel(new BorderLayout());
         headerWithLine.setOpaque(false);
@@ -97,8 +85,27 @@ public class RoomsPanel extends JPanel implements RoomObserver, AuthObserver {
         return headerWithLine;
     }
 
-    private void openCreateRoomDialog() {
-        CreateRoomDialog dialog = new CreateRoomDialog(SwingUtilities.getWindowAncestor(this), roomService);
+    /** A soft, violet-tinted pill with a "+" icon, e.g. "+ Room". */
+    private JButton createActionButton(String text, String tooltip, CreateRoomDialog.Mode mode) {
+        FlatSVGIcon icon = new FlatSVGIcon("icons/add.svg", 12, 12);
+        icon.setColorFilter(new FlatSVGIcon.ColorFilter(color -> UIManager.getColor("Yapper.highlight")));
+
+        JButton button = new JButton(text, icon);
+        button.putClientProperty(FlatClientProperties.STYLE,
+                "arc: 999; "
+                        + "background: fade(@accentColor,16%); foreground: @yapperHighlight; "
+                        + "hoverBackground: fade(@accentColor,28%); pressedBackground: fade(@accentColor,38%); "
+                        + "borderColor: fade(@accentColor,16%); focusedBorderColor: @yapperHighlight");
+        button.setFont(button.getFont().deriveFont(Font.BOLD));
+        button.setIconTextGap(6);
+        button.setMargin(new Insets(6, 12, 6, 12));
+        button.setToolTipText(tooltip);
+        button.addActionListener(e -> openCreateRoomDialog(mode));
+        return button;
+    }
+
+    private void openCreateRoomDialog(CreateRoomDialog.Mode mode) {
+        CreateRoomDialog dialog = new CreateRoomDialog(SwingUtilities.getWindowAncestor(this), roomService, mode);
         roomService.addObserver(dialog);
         dialog.setVisible(true);
     }
@@ -109,6 +116,28 @@ public class RoomsPanel extends JPanel implements RoomObserver, AuthObserver {
             model.addElement(room);
             roomList.setSelectedValue(room, true);
         });
+    }
+
+    @Override
+    public void onDmOpened(RoomInfo room) {
+        SwingUtilities.invokeLater(() -> {
+            // The DM may already be in the list: then just select it
+            RoomInfo existing = findRoom(room.id());
+            if (existing == null) {
+                model.addElement(room);
+                existing = room;
+            }
+            roomList.setSelectedValue(existing, true);
+        });
+    }
+
+    private RoomInfo findRoom(long roomId) {
+        for (int i = 0; i < model.size(); i++) {
+            if (model.get(i).id() == roomId) {
+                return model.get(i);
+            }
+        }
+        return null;
     }
 
     @Override

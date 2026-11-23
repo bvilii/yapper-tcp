@@ -4,8 +4,11 @@ import io.github.bvilii.yapper.client.backend.network.ServerConnection;
 import io.github.bvilii.yapper.client.backend.service.auth.AuthObserver;
 import io.github.bvilii.yapper.common.message.MessageCodec;
 import io.github.bvilii.yapper.common.message.client.CreateRoomRequest;
+import io.github.bvilii.yapper.common.message.client.OpenDmRequest;
 import io.github.bvilii.yapper.common.message.client.RoomListRequest;
 import io.github.bvilii.yapper.common.message.server.CreateRoomFailed;
+import io.github.bvilii.yapper.common.message.server.DmOpened;
+import io.github.bvilii.yapper.common.message.server.OpenDmFailed;
 import io.github.bvilii.yapper.common.message.server.RoomCreated;
 import io.github.bvilii.yapper.common.message.server.RoomList;
 
@@ -65,6 +68,22 @@ public class RoomService implements RoomSubject, AuthObserver {
     public void handleRoomList(RoomList message) {
         for (RoomObserver observer : observers) {
             observer.onRoomsLoaded(message.rooms());
+        }
+    }
+
+    public void openDm(String username) {
+        connection.writeToServer(codec.encode(new OpenDmRequest(username)));
+    }
+
+    public void handleDmOpened(DmOpened message) {
+        for (RoomObserver observer : observers) {
+            observer.onDmOpened(message.room());
+        }
+    }
+
+    public void handleOpenDmFailed(OpenDmFailed message) {
+        for (RoomObserver observer : observers) {
+            observer.onOpenDmFailed(message.reason());
         }
     }
 }
