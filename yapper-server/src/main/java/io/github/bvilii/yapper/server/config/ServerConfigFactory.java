@@ -7,10 +7,10 @@ import java.util.Map;
 
 public class ServerConfigFactory {
     private static final Logger log = LoggerFactory.getLogger(ServerConfigFactory.class);
-    private static final String DEFAULT_ENV_PORT_KEY = "SERVER_PORT";
-    private static final String DB_URL_KEY = "DB_URL";
-    private static final String DB_USER_KEY = "DB_USER";
-    private static final String DB_PASSWORD_KEY = "DB_PASSWORD";
+    private static final String DEFAULT_ENV_PORT_KEY = "YAPPER_SERVER_PORT";
+    private static final String DB_URL_KEY = "YAPPER_DB_URL";
+    private static final String DB_USER_KEY = "YAPPER_DB_USER";
+    private static final String DB_PASSWORD_KEY = "YAPPER_DB_PASSWORD";
     static final int DEFAULT_PORT = 9099;
 
     private ServerConfigFactory() {

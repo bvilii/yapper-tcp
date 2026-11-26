@@ -44,3 +44,5 @@ build/
 *.p12
 *.jks
 *.key
+
+.env
