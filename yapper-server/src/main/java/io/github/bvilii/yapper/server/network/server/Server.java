@@ -32,10 +32,10 @@ public class Server {
 
     static SSLServerSocket createServerSocket(int port) throws Exception {
         // 1. Where is the keystore, and what's its password? (from environment variables)
-        String keystorePath = System.getenv().getOrDefault("CHAT_KEYSTORE", "server.p12");
-        String pass = System.getenv("CHAT_KEYSTORE_PASS");
+        String keystorePath = System.getenv().getOrDefault("YAPPER_KEYSTORE", "server.p12");
+        String pass = System.getenv("YAPPER_KEYSTORE_PASSWORD");
         if (pass == null) {
-            throw new IllegalStateException("CHAT_KEYSTORE_PASS is not set");
+            throw new IllegalStateException("YAPPER_KEYSTORE_PASSWORD is not set");
         }
         char[] password = pass.toCharArray();
 

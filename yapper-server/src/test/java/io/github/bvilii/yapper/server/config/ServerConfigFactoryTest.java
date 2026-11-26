@@ -15,9 +15,9 @@ class ServerConfigFactoryTest {
 
     private static Map<String, String> validEnv() {
         Map<String, String> env = new HashMap<>();
-        env.put("DB_URL", "jdbc:mysql://localhost:3306/yapper");
-        env.put("DB_USER", "yapper");
-        env.put("DB_PASSWORD", "secret");
+        env.put("YAPPER_DB_URL", "jdbc:mysql://localhost:3306/yapper");
+        env.put("YAPPER_DB_USER", "yapper");
+        env.put("YAPPER_DB_PASSWORD", "secret");
         return env;
     }
 
@@ -33,7 +33,7 @@ class ServerConfigFactoryTest {
     @DisplayName("Should use the port when it is valid")
     void load_validPort_usesPortFromEnv() {
         Map<String, String> env = validEnv();
-        env.put("SERVER_PORT", "8000");
+        env.put("YAPPER_SERVER_PORT", "8000");
 
         ServerConfig config = ServerConfigFactory.load(env);
 
@@ -44,7 +44,7 @@ class ServerConfigFactoryTest {
     @DisplayName("Should throw when port is an invalid configuration")
     void load_nonNumericPort_throwsIllegalArgumentException() {
         Map<String, String> env = validEnv();
-        env.put("SERVER_PORT", "abc");
+        env.put("YAPPER_SERVER_PORT", "abc");
 
         assertThatThrownBy(() -> ServerConfigFactory.load(env))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -55,7 +55,7 @@ class ServerConfigFactoryTest {
     @DisplayName("Should fall back to the default port when port value is blank")
     void load_blankPortValue_usesDefault(String value) {
         Map<String, String> env = validEnv();
-        env.put("SERVER_PORT", value);
+        env.put("YAPPER_SERVER_PORT", value);
 
         ServerConfig config = ServerConfigFactory.load(env);
 
@@ -73,7 +73,7 @@ class ServerConfigFactoryTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"DB_URL", "DB_USER", "DB_PASSWORD"})
+    @ValueSource(strings = {"YAPPER_DB_URL", "YAPPER_DB_USER", "YAPPER_DB_PASSWORD"})
     @DisplayName("Should throw when a required database key is missing")
     void load_missingDbKey_throwsIllegalStateException(String key) {
         Map<String, String> env = validEnv();
@@ -85,7 +85,7 @@ class ServerConfigFactoryTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"DB_URL", "DB_USER", "DB_PASSWORD"})
+    @ValueSource(strings = {"YAPPER_DB_URL", "YAPPER_DB_USER", "YAPPER_DB_PASSWORD"})
     @DisplayName("Should throw when a required database value is blank")
     void load_blankDbValue_throwsIllegalStateException(String key) {
         Map<String, String> env = validEnv();
