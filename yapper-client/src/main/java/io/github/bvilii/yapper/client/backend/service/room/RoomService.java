@@ -4,13 +4,10 @@ import io.github.bvilii.yapper.client.backend.network.ServerConnection;
 import io.github.bvilii.yapper.client.backend.service.auth.AuthObserver;
 import io.github.bvilii.yapper.common.message.MessageCodec;
 import io.github.bvilii.yapper.common.message.client.CreateRoomRequest;
+import io.github.bvilii.yapper.common.message.client.DeleteRoomRequest;
 import io.github.bvilii.yapper.common.message.client.OpenDmRequest;
 import io.github.bvilii.yapper.common.message.client.RoomListRequest;
-import io.github.bvilii.yapper.common.message.server.CreateRoomFailed;
-import io.github.bvilii.yapper.common.message.server.DmOpened;
-import io.github.bvilii.yapper.common.message.server.OpenDmFailed;
-import io.github.bvilii.yapper.common.message.server.RoomCreated;
-import io.github.bvilii.yapper.common.message.server.RoomList;
+import io.github.bvilii.yapper.common.message.server.*;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -85,5 +82,15 @@ public class RoomService implements RoomSubject, AuthObserver {
         for (RoomObserver observer : observers) {
             observer.onOpenDmFailed(message.reason());
         }
+    }
+
+    public void handleRoomDeleted(RoomDeleted message) {
+        for (RoomObserver observer : observers) {
+            observer.onRoomDeleted(message.roomId());
+        }
+    }
+
+    public void deleteRoom(long roomId) {
+        connection.writeToServer(codec.encode(new DeleteRoomRequest(roomId)));
     }
 }

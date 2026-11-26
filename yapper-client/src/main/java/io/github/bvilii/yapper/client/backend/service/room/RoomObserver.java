@@ -19,4 +19,7 @@ public interface RoomObserver {
 
     default void onOpenDmFailed(String reason) {
     }
+
+    default void onRoomDeleted(long roomId) {
+    }
 }

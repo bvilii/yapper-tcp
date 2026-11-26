@@ -10,6 +10,7 @@ import io.github.bvilii.yapper.common.model.RoomInfo;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.function.Consumer;
@@ -58,8 +59,41 @@ public class RoomsPanel extends JPanel implements RoomObserver, AuthObserver {
         JScrollPane scroll = new JScrollPane(roomList);
         scroll.setBorder(BorderFactory.createEmptyBorder());
 
+        JPopupMenu roomMenu = new JPopupMenu();
+        JMenuItem deleteItem = new JMenuItem("Delete");
+        deleteItem.addActionListener(e -> confirmAndDelete(roomList.getSelectedValue()));
+        roomMenu.add(deleteItem);
+
+        roomList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    int index = roomList.locationToIndex(e.getPoint());
+                    if (index >= 0) {
+                        roomList.setSelectedIndex(index);
+                        roomMenu.show(roomList, e.getX(), e.getY());
+                    }
+                }
+            }
+        });
+
         add(createHeader(), BorderLayout.NORTH);
         add(scroll, BorderLayout.CENTER);
+    }
+
+    private void confirmAndDelete(RoomInfo room) {
+        if (room == null) {
+            return;
+        }
+        int answer = JOptionPane.showConfirmDialog(
+                this,
+                "Delete this chat for everyone? All messages will be lost.",
+                "Delete chat",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
+        if (answer == JOptionPane.YES_OPTION) {
+            roomService.deleteRoom(room.id());
+        }
     }
 
     private JPanel createHeader() {
@@ -152,6 +186,16 @@ public class RoomsPanel extends JPanel implements RoomObserver, AuthObserver {
     public void onLoggedOut(){
         SwingUtilities.invokeLater(() -> {
             model.clear();
+        });
+    }
+
+    @Override
+    public void onRoomDeleted(long roomId) {
+        SwingUtilities.invokeLater(() -> {
+            RoomInfo room = findRoom(roomId);
+            if (room != null) {
+                model.removeElement(room);
+            }
         });
     }
 }

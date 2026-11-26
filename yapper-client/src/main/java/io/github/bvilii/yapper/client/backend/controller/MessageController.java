@@ -42,6 +42,7 @@ public class MessageController {
             case ChatMessage m -> chatService.handleChatArrived(m);
             case ErrorMessage m -> {
             }
+            case RoomDeleted m -> roomService.handleRoomDeleted(m);
         }
     }
 }
