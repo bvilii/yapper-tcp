@@ -16,9 +16,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value = RoomList.class, name = "ROOM_LIST"),
         @JsonSubTypes.Type(value = RoomHistory.class, name = "ROOM_HISTORY"),
         @JsonSubTypes.Type(value = DmOpened.class, name = "DM_OPENED"),
-        @JsonSubTypes.Type(value = OpenDmFailed.class, name = "OPEN_DM_FAILED")
+        @JsonSubTypes.Type(value = OpenDmFailed.class, name = "OPEN_DM_FAILED"),
+        @JsonSubTypes.Type(value = RoomDeleted.class, name = "ROOM_DELETED")
 })
 public sealed interface ServerMessage
-        permits ChatMessage, CreateRoomFailed, DmOpened, ErrorMessage, LoginFailed, LoginOk, OpenDmFailed,
-        RegisterFailed, RegisterOk, RoomCreated, RoomHistory, RoomList {
+        permits ChatMessage, CreateRoomFailed, DmOpened, ErrorMessage, LoginFailed, LoginOk, OpenDmFailed, RegisterFailed, RegisterOk, RoomCreated, RoomDeleted, RoomHistory, RoomList {
 }

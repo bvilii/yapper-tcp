@@ -53,6 +53,7 @@ public class MessageController {
             case RoomHistoryRequest request -> chatService.handleRoomHistoryRequest(request, sender);
             case Logout request -> authService.handleLogout(sender);
             case OpenDmRequest request -> roomService.handleOpenDm(request, sender);
+            case DeleteRoomRequest request -> roomService.handleDeleteRoom(request, sender);
         }
     }
 }
