@@ -56,7 +56,7 @@ public class AuthService {
         User user = found.get();
         sender.authenticate(user);
         registerClientToOnline(sender, user);
-        sender.send(codec.encode(new LoginOk(user.username(), null)));
+        sender.send(codec.encode(new LoginOk(user.username())));
     }
 
     private void registerClientToOnline(ClientHandler handler, User user) {
