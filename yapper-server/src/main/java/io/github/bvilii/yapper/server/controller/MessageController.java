@@ -3,10 +3,6 @@ package io.github.bvilii.yapper.server.controller;
 import io.github.bvilii.yapper.common.message.InvalidMessageException;
 import io.github.bvilii.yapper.common.message.MessageCodec;
 import io.github.bvilii.yapper.common.message.client.*;
-import io.github.bvilii.yapper.common.message.client.LoginRequest;
-import io.github.bvilii.yapper.common.message.client.RegisterRequest;
-import io.github.bvilii.yapper.common.message.client.TokenLoginRequest;
-import io.github.bvilii.yapper.common.message.client.SendChat;
 import io.github.bvilii.yapper.common.message.server.ErrorMessage;
 import io.github.bvilii.yapper.server.service.AuthService;
 import io.github.bvilii.yapper.server.service.ChatService;
@@ -35,8 +31,7 @@ public class MessageController {
         }
 
         boolean isAuthMessage = message instanceof RegisterRequest
-                || message instanceof LoginRequest
-                || message instanceof TokenLoginRequest;
+                || message instanceof LoginRequest;
 
         if (!sender.isAuthenticated() && !isAuthMessage) {
             sender.send(codec.encode(new ErrorMessage("Not authenticated")));
@@ -47,7 +42,6 @@ public class MessageController {
             case RegisterRequest request -> authService.handleRegister(request, sender);
             case LoginRequest request -> authService.handleLogin(request, sender);
             case SendChat request -> chatService.handleSendChat(request, sender);
-            case TokenLoginRequest request -> sender.send(codec.encode(new ErrorMessage("Not supported yet")));
             case CreateRoomRequest request -> roomService.handleRoomCreation(request, sender);
             case RoomListRequest request -> roomService.handleRoomListRequest(sender);
             case RoomHistoryRequest request -> chatService.handleRoomHistoryRequest(request, sender);
