@@ -44,6 +44,9 @@ public class JdbcRoomRepository implements RoomRepository {
     private static final String FIND_MEMBER_IDS =
             "SELECT user_id FROM room_members WHERE room_id = ?";
 
+    private static final String DELETE_ROOM_BY_ID =
+            "DELETE FROM rooms WHERE id = ?";
+
     private final DataSource dataSource;
 
     public JdbcRoomRepository(DataSource dataSource) {
@@ -171,6 +174,17 @@ public class JdbcRoomRepository implements RoomRepository {
             }
         } catch (SQLException e) {
             throw new IllegalStateException("Failed to create direct room", e);
+        }
+    }
+
+    @Override
+    public void deleteRoomByRoomId(long roomId) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(DELETE_ROOM_BY_ID)) {
+            statement.setLong(1, roomId);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new IllegalStateException("Failed to delete room: " + roomId, e);
         }
     }
 

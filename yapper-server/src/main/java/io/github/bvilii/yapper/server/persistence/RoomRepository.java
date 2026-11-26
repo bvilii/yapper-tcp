@@ -16,4 +16,6 @@ public interface RoomRepository {
 
     /** Creates the direct room of two users. Throws DirectRoomAlreadyExistsException if they already have one. */
     Room createDirect(long creatorId, long otherId);
+
+    void deleteRoomByRoomId(long roomId);
 }

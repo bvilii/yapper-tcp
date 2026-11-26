@@ -2,12 +2,9 @@ package io.github.bvilii.yapper.server.service;
 
 import io.github.bvilii.yapper.common.message.MessageCodec;
 import io.github.bvilii.yapper.common.message.client.CreateRoomRequest;
+import io.github.bvilii.yapper.common.message.client.DeleteRoomRequest;
 import io.github.bvilii.yapper.common.message.client.OpenDmRequest;
-import io.github.bvilii.yapper.common.message.server.CreateRoomFailed;
-import io.github.bvilii.yapper.common.message.server.DmOpened;
-import io.github.bvilii.yapper.common.message.server.OpenDmFailed;
-import io.github.bvilii.yapper.common.message.server.RoomCreated;
-import io.github.bvilii.yapper.common.message.server.RoomList;
+import io.github.bvilii.yapper.common.message.server.*;
 import io.github.bvilii.yapper.common.model.RoomInfo;
 import io.github.bvilii.yapper.common.model.RoomType;
 import io.github.bvilii.yapper.server.controller.ClientHandler;
@@ -179,5 +176,27 @@ public class RoomService {
 
     private void failDm(ClientHandler sender, String reason) {
         sender.send(codec.encode(new OpenDmFailed(reason)));
+    }
+
+    public void handleDeleteRoom(DeleteRoomRequest request, ClientHandler sender) {
+        User user = sender.getUser();
+        if (user == null) {
+            return;
+        }
+
+        // Check if the sender is in the room
+        Set<Long> memberIds = roomRepository.findMemberIds(request.roomId());
+        if (!memberIds.contains(user.id())) {
+            sender.send(codec.encode(new ErrorMessage("You are not a member of this room")));
+            return;
+        }
+
+        // Delete the room then notify the members of said room
+        roomRepository.deleteRoomByRoomId(request.roomId());
+
+        String json = codec.encode(new RoomDeleted(request.roomId()));
+        for (ClientHandler client : registry.getOnlineClients(memberIds)) {
+            client.send(json);
+        }
     }
 }
