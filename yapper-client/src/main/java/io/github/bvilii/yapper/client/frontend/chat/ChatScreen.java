@@ -16,6 +16,7 @@ public class ChatScreen extends JPanel {
         ChatPanel chat = new ChatPanel(chatService, session);
         chatService.addObserver(chat);
         authService.addObserver(chat);
+        roomService.addObserver(chat);
 
         RoomsPanel rooms = new RoomsPanel(roomService, session, room -> chat.openRoom(room));
         roomService.addObserver(rooms);

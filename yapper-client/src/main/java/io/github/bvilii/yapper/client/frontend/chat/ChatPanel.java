@@ -5,6 +5,7 @@ import io.github.bvilii.yapper.client.backend.service.auth.AuthObserver;
 import io.github.bvilii.yapper.client.backend.service.auth.Session;
 import io.github.bvilii.yapper.client.backend.service.chat.ChatObserver;
 import io.github.bvilii.yapper.client.backend.service.chat.ChatService;
+import io.github.bvilii.yapper.client.backend.service.room.RoomObserver;
 import io.github.bvilii.yapper.common.model.MessageInfo;
 import io.github.bvilii.yapper.common.model.RoomInfo;
 import io.github.bvilii.yapper.common.model.RoomType;
@@ -13,7 +14,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
-public class ChatPanel extends JPanel implements ChatObserver, AuthObserver {
+public class ChatPanel extends JPanel implements ChatObserver, AuthObserver, RoomObserver {
     static final int HEADER_HEIGHT = 64;
 
     private final ChatService chatService;
@@ -154,14 +155,25 @@ public class ChatPanel extends JPanel implements ChatObserver, AuthObserver {
     }
 
     @Override
-    public void onLoggedOut(){
+    public void onLoggedOut() {
+        SwingUtilities.invokeLater(this::showNoRoom);
+    }
+
+    @Override
+    public void onRoomDeleted(long roomId) {
         SwingUtilities.invokeLater(() -> {
-            currentRoom = null;
-            model.clear();
-            roomTitle.setText("Select a room");
-            roomMembers.setText(" ");
-            setInputEnabled(false);
-            inputField.setText("");
+            if (currentRoom != null && currentRoom.id() == roomId) {
+                showNoRoom();
+            }
         });
+    }
+
+    private void showNoRoom() {
+        currentRoom = null;
+        model.clear();
+        roomTitle.setText("Select a room");
+        roomMembers.setText(" ");
+        setInputEnabled(false);
+        inputField.setText("");
     }
 }
