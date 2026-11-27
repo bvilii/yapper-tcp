@@ -1,0 +1,32 @@
+# Build output
+**/target
+**/*.class
+dependency-reduced-pom.xml
+
+# IDE and OS files
+**/.idea
+**/*.iml
+**/.DS_Store
+
+# Git
+**/.git
+**/.gitignore
+
+# Docker files (Docker reads them separately, no need to copy them)
+**/Dockerfile*
+**/docker-compose*
+**/.dockerignore
+
+# Logs and JVM crash files
+**/*.log
+hs_err_pid*
+
+# Secrets: never put these in an image
+**/.env
+**/*.p12
+**/*.jks
+**/*.key
+
+# Docs, not needed to run the server
+README.md
+LICENSE
