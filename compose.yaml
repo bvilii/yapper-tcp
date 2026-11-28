@@ -1,0 +1,47 @@
+name: yapper
+
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?set MYSQL_ROOT_PASSWORD in .env}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:?set MYSQL_DATABASE in .env}
+      MYSQL_USER: ${YAPPER_DB_USER:?set YAPPER_DB_USER in .env}
+      MYSQL_PASSWORD: ${YAPPER_DB_PASSWORD:?set YAPPER_DB_PASSWORD in .env}
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--silent" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    command:
+      - --performance-schema=OFF
+      - --innodb-buffer-pool-size=64M
+
+  server:
+    image: ghcr.io/bvilii/yapper-server:0.1.0
+    build:
+      context: .
+      dockerfile: yapper-server/Dockerfile
+    restart: unless-stopped
+    environment:
+      YAPPER_SERVER_PORT: ${YAPPER_SERVER_PORT:-9099}
+      YAPPER_DB_USER: ${YAPPER_DB_USER:?set YAPPER_DB_USER in .env}
+      YAPPER_DB_PASSWORD: ${YAPPER_DB_PASSWORD:?set YAPPER_DB_PASSWORD in .env}
+      YAPPER_DB_URL: ${YAPPER_DB_URL:?set YAPPER_DB_URL in .env}
+      YAPPER_KEYSTORE: /app/certs/server.p12
+      YAPPER_KEYSTORE_PASSWORD: ${YAPPER_KEYSTORE_PASSWORD:?set YAPPER_KEYSTORE_PASSWORD in .env}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ${YAPPER_KEYSTORE_FILE:?set it in .env}:/app/certs/server.p12:ro
+    ports:
+      - "9099:${YAPPER_SERVER_PORT:-9099}"
+
+volumes:
+  mysql-data:
