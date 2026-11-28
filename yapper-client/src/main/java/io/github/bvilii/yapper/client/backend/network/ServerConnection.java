@@ -4,6 +4,7 @@ import javax.net.ssl.*;
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
@@ -21,7 +22,7 @@ public class ServerConnection {
         this.executor = executor;
     }
 
-    public void connectToServer() throws Exception {
+    public void connectToServer() throws IOException, GeneralSecurityException {
         Socket serverSocket = connect();
 
         br = new BufferedReader(new InputStreamReader(serverSocket.getInputStream(), StandardCharsets.UTF_8));
@@ -44,7 +45,7 @@ public class ServerConnection {
         return reader.readLine();
     }
 
-    static SSLSocketFactory createSocketFactory() throws Exception {
+    static SSLSocketFactory createSocketFactory() throws IOException, GeneralSecurityException {
         // 1. Load the certificate: from CHAT_SERVER_CERT if set (self-hosters), else the built-in one
         String certPath = System.getenv("CHAT_SERVER_CERT");
         Certificate cert;
@@ -72,18 +73,22 @@ public class ServerConnection {
         return ctx.getSocketFactory();
     }
 
-    static Socket connect() throws Exception {
+    private static Socket connect() throws IOException, GeneralSecurityException {
         String host = System.getenv().getOrDefault("CHAT_HOST", "bvilii-yapper.duckdns.org");
         int port = Integer.parseInt(System.getenv().getOrDefault("CHAT_PORT", "9099"));
 
         SSLSocket socket = (SSLSocket) createSocketFactory().createSocket(host, port);
+        try {
+            SSLParameters params = socket.getSSLParameters();
+            params.setEndpointIdentificationAlgorithm("HTTPS");
+            params.setProtocols(new String[] {"TLSv1.3"});
+            socket.setSSLParameters(params);
 
-        SSLParameters params = socket.getSSLParameters();
-        params.setEndpointIdentificationAlgorithm("HTTPS"); // turn ON the hostname check
-        params.setProtocols(new String[] {"TLSv1.3"});
-        socket.setSSLParameters(params);
-
-        socket.startHandshake();  // do the handshake now, fail right here if anything's wrong
-        return socket;
+            socket.startHandshake();
+            return socket;
+        } catch (IOException e) {
+            socket.close();
+            throw e;
+        }
     }
 }
