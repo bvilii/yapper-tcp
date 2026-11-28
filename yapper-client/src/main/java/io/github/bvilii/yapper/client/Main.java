@@ -12,15 +12,19 @@ import io.github.bvilii.yapper.client.backend.service.chat.ChatService;
 import io.github.bvilii.yapper.client.backend.service.room.RoomService;
 import io.github.bvilii.yapper.client.frontend.MainWindow;
 import io.github.bvilii.yapper.common.message.MessageCodec;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class Main {
-    public static void main(String[] args) throws Exception {
+    private static final Logger log = LoggerFactory.getLogger(Main.class);
+    public static void main(String[] args) {
         Executor executor = Executors.newVirtualThreadPerTaskExecutor();
 
 
@@ -60,7 +64,16 @@ public class Main {
             window.show();
         });
 
-        controller.start();
+        try {
+            controller.start();
+        } catch (IOException | GeneralSecurityException e) {
+            log.error("Could not connect to the server", e);
+            SwingUtilities.invokeLater(() -> {
+                JOptionPane.showMessageDialog(null, "Could not connect to the server.",
+                        "Yapper", JOptionPane.ERROR_MESSAGE);
+                System.exit(1);
+            });
+        }
 
     }
 }

@@ -3,6 +3,7 @@ package io.github.bvilii.yapper.client.backend.controller;
 import io.github.bvilii.yapper.client.backend.network.ServerConnection;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 
 public class ClientController {
     private final ServerConnection connection;
@@ -13,7 +14,7 @@ public class ClientController {
         this.router = router;
     }
 
-    public void start() throws Exception {
+    public void start() throws IOException, GeneralSecurityException {
         connection.connectToServer();
         connection.startWriterThread();
         startReadingFromServerLoop();
