@@ -16,15 +16,13 @@ public class SocketWriter implements Runnable {
 
     @Override
     public void run() {
-        while(true){
-            try {
+        try {
+            while (true) {
                 String line = messageQueue.take();
-
                 send(line);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-
             }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -38,7 +36,7 @@ public class SocketWriter implements Runnable {
         }
     }
 
-    public void addToQueue(String line){
-        messageQueue.offer(line);
+    public void addToQueue(String line) {
+        messageQueue.add(line);
     }
 }
