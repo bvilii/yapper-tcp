@@ -46,4 +46,3 @@ build/
 *.key
 
 .env
-dependency-reduced-pom.xml
