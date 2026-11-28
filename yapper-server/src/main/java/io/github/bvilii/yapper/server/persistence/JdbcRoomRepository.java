@@ -55,22 +55,9 @@ public class JdbcRoomRepository implements RoomRepository {
 
     @Override
     public Room create(String name, long createdBy, Set<Long> memberIds) {
-        Instant createdAt = Instant.now();
-        Timestamp timestamp = Timestamp.from(createdAt);
-
         try (Connection connection = dataSource.getConnection()) {
             connection.setAutoCommit(false);
-            try {
-                long roomId = insertRoom(connection, name, createdBy, timestamp);
-                insertMembers(connection, roomId, memberIds, timestamp);
-                connection.commit();
-                return new Room(roomId, name, RoomType.GROUP, createdBy, createdAt);
-            } catch (SQLException e) {
-                connection.rollback();
-                throw e;
-            } finally {
-                connection.setAutoCommit(true);
-            }
+            return insertGroupRoomWithMembers(connection, name, createdBy, memberIds, Instant.now());
         } catch (SQLException e) {
             throw new IllegalStateException("Failed to create room: " + name, e);
         }
@@ -152,26 +139,9 @@ public class JdbcRoomRepository implements RoomRepository {
 
     @Override
     public Room createDirect(long creatorId, long otherId) {
-        Instant createdAt = Instant.now();
-        Timestamp timestamp = Timestamp.from(createdAt);
-
         try (Connection connection = dataSource.getConnection()) {
             connection.setAutoCommit(false);
-            try {
-                long roomId = insertDirectRoom(connection, creatorId, otherId, timestamp);
-                insertMembers(connection, roomId, Set.of(creatorId, otherId), timestamp);
-                connection.commit();
-                return new Room(roomId, null, RoomType.DIRECT, creatorId, createdAt);
-            } catch (SQLIntegrityConstraintViolationException e) {
-                // The UNIQUE dm_key says these two already have a direct room
-                connection.rollback();
-                throw new DirectRoomAlreadyExistsException(e);
-            } catch (SQLException e) {
-                connection.rollback();
-                throw e;
-            } finally {
-                connection.setAutoCommit(true);
-            }
+            return insertDirectRoomWithMembers(connection, creatorId, otherId, Instant.now());
         } catch (SQLException e) {
             throw new IllegalStateException("Failed to create direct room", e);
         }
@@ -185,6 +155,44 @@ public class JdbcRoomRepository implements RoomRepository {
             statement.executeUpdate();
         } catch (SQLException e) {
             throw new IllegalStateException("Failed to delete room: " + roomId, e);
+        }
+    }
+
+    /** Inserts a group room and its members in one transaction. */
+    private Room insertGroupRoomWithMembers(Connection connection, String name, long createdBy,
+                                            Set<Long> memberIds, Instant createdAt) throws SQLException {
+        Timestamp timestamp = Timestamp.from(createdAt);
+        try {
+            long roomId = insertRoom(connection, name, createdBy, timestamp);
+            insertMembers(connection, roomId, memberIds, timestamp);
+            connection.commit();
+            return new Room(roomId, name, RoomType.GROUP, createdBy, createdAt);
+        } catch (SQLException e) {
+            connection.rollback();
+            throw e;
+        } finally {
+            connection.setAutoCommit(true);
+        }
+    }
+
+    /** Inserts a direct room and its two members in one transaction. */
+    private Room insertDirectRoomWithMembers(Connection connection, long creatorId,
+                                             long otherId, Instant createdAt) throws SQLException {
+        Timestamp timestamp = Timestamp.from(createdAt);
+        try {
+            long roomId = insertDirectRoom(connection, creatorId, otherId, timestamp);
+            insertMembers(connection, roomId, Set.of(creatorId, otherId), timestamp);
+            connection.commit();
+            return new Room(roomId, null, RoomType.DIRECT, creatorId, createdAt);
+        } catch (SQLIntegrityConstraintViolationException e) {
+            // The UNIQUE dm_key says these two already have a direct room
+            connection.rollback();
+            throw new DirectRoomAlreadyExistsException(e);
+        } catch (SQLException e) {
+            connection.rollback();
+            throw e;
+        } finally {
+            connection.setAutoCommit(true);
         }
     }
 
@@ -221,10 +229,10 @@ public class JdbcRoomRepository implements RoomRepository {
     private void insertMembers(Connection connection, long roomId,
                                Set<Long> memberIds, Timestamp joinedAt) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(INSERT_MEMBER)) {
+            statement.setLong(1, roomId);
+            statement.setTimestamp(3, joinedAt);
             for (long userId : memberIds) {
-                statement.setLong(1, roomId);
                 statement.setLong(2, userId);
-                statement.setTimestamp(3, joinedAt);
                 statement.addBatch();
             }
             statement.executeBatch();
