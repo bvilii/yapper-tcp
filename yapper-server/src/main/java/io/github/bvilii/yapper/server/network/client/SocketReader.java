@@ -11,7 +11,6 @@ public class SocketReader {
     }
 
     public String readFromClient() throws IOException {
-        String line = br.readLine();
-        return line;
+        return br.readLine();
     }
 }

@@ -16,11 +16,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 
 public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         ServerConfig config = ServerConfigFactory.load();
         HikariDataSource dataSource = DataSourceFactory.create(config);
         MessageCodec codec = new MessageCodec();
@@ -37,6 +38,11 @@ public class Main {
         ServerController serverController = new ServerController(new Server(config), router);
 
         log.info("Starting server on port {}", config.port());
-        serverController.startServer();
+        try {
+            serverController.startServer();
+        } catch (IOException | GeneralSecurityException e) {
+            log.error("Could not start the server", e);
+            System.exit(1);
+        }
     }
 }
