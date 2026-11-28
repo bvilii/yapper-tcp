@@ -7,7 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class MessageCellRenderer extends DefaultListCellRenderer {
-    private final Session session;
+    private final transient Session session;
 
     public MessageCellRenderer(Session session) {
         this.session = session;

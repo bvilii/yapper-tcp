@@ -16,14 +16,12 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class RoomsPanel extends JPanel implements RoomObserver, AuthObserver {
-    private final RoomService roomService;
+    private final transient RoomService roomService;
     private final DefaultListModel<RoomInfo> model = new DefaultListModel<>();
     private final JList<RoomInfo> roomList;
-    private final Consumer<RoomInfo> onRoomSelected;
 
     public RoomsPanel(RoomService roomService, Session session, Consumer<RoomInfo> onRoomSelected) {
         this.roomService = roomService;
-        this.onRoomSelected = onRoomSelected;
         setLayout(new BorderLayout());
 
         roomList = new JList<>(model) {
@@ -184,9 +182,7 @@ public class RoomsPanel extends JPanel implements RoomObserver, AuthObserver {
 
     @Override
     public void onLoggedOut(){
-        SwingUtilities.invokeLater(() -> {
-            model.clear();
-        });
+        SwingUtilities.invokeLater(model::clear);
     }
 
     @Override

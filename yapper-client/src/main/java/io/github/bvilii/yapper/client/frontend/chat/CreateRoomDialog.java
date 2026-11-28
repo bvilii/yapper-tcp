@@ -20,7 +20,7 @@ public class CreateRoomDialog extends JDialog implements RoomObserver {
 
     private static final int MAX_ROOM_NAME_LENGTH = 64;
 
-    private final RoomService roomService;
+    private final transient RoomService roomService;
     private final Mode mode;
     private final List<String> people = new ArrayList<>();
 

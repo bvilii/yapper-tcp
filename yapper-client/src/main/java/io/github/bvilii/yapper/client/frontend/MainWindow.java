@@ -10,6 +10,8 @@ import io.github.bvilii.yapper.client.backend.service.chat.ChatService;
 import io.github.bvilii.yapper.client.backend.service.room.RoomService;
 import io.github.bvilii.yapper.client.frontend.auth.AuthScreen;
 import io.github.bvilii.yapper.client.frontend.chat.ChatScreen;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,6 +28,8 @@ public class MainWindow implements AuthObserver {
 
     private JMenuItem logout;
 
+    private static final Logger log = LoggerFactory.getLogger(MainWindow.class);
+
     public MainWindow(AuthService authService, RoomService roomService,
                       ChatService chatService, Session session) {
 
@@ -36,7 +40,7 @@ public class MainWindow implements AuthObserver {
         createMenubar();
 
         frame.setContentPane(root);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setSize(800, 550);
         frame.setMinimumSize(new Dimension(800, 550));
         frame.setLocationRelativeTo(null);
@@ -131,7 +135,7 @@ public class MainWindow implements AuthObserver {
             UIManager.setLookAndFeel(laf);
             FlatLaf.updateUI();
         } catch (UnsupportedLookAndFeelException ex) {
-            System.err.println("Nem sikerült a témaváltás: " + ex.getMessage());
+            log.warn("Could not switch the theme", ex);
         }
     }
 
