@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 
 public class Server {
@@ -21,7 +22,7 @@ public class Server {
         this.config = config;
     }
 
-    public void open() throws Exception {
+    public void open() throws IOException, GeneralSecurityException {
         serverSocket = createServerSocket(config.port());
     }
 
@@ -30,7 +31,7 @@ public class Server {
         return ClientConnection.open(socket);
     }
 
-    static SSLServerSocket createServerSocket(int port) throws Exception {
+    static SSLServerSocket createServerSocket(int port) throws IOException, GeneralSecurityException {
         // 1. Where is the keystore, and what's its password? (from environment variables)
         String keystorePath = System.getenv().getOrDefault("YAPPER_KEYSTORE", "server.p12");
         String pass = System.getenv("YAPPER_KEYSTORE_PASSWORD");

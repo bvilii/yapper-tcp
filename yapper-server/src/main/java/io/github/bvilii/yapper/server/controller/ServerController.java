@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -21,7 +22,7 @@ public class ServerController {
         this.router = router;
     }
 
-    public void startServer() throws Exception {
+    public void startServer() throws IOException, GeneralSecurityException {
         server.open();
         acceptClientLoop();
     }
