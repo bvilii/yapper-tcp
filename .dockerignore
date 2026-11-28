@@ -1,7 +1,6 @@
 # Build output
 **/target
 **/*.class
-dependency-reduced-pom.xml
 
 # IDE and OS files
 **/.idea
@@ -14,7 +13,7 @@ dependency-reduced-pom.xml
 
 # Docker files (Docker reads them separately, no need to copy them)
 **/Dockerfile*
-**/docker-compose*
+**/compose*.yaml
 **/.dockerignore
 
 # Logs and JVM crash files
