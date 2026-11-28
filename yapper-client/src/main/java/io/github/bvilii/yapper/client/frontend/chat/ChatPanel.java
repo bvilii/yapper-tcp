@@ -17,8 +17,8 @@ import java.util.List;
 public class ChatPanel extends JPanel implements ChatObserver, AuthObserver, RoomObserver {
     static final int HEADER_HEIGHT = 64;
 
-    private final ChatService chatService;
-    private final Session session;
+    private final transient ChatService chatService;
+    private final transient Session session;
     private final DefaultListModel<MessageInfo> model = new DefaultListModel<>();
     private final JList<MessageInfo> messageList;
     private final JLabel roomTitle = new JLabel("Select a room");
@@ -26,7 +26,7 @@ public class ChatPanel extends JPanel implements ChatObserver, AuthObserver, Roo
     private final JTextField inputField = new JTextField();
     private final JButton sendButton = new JButton(" ➤ ");
 
-    private RoomInfo currentRoom;
+    private transient RoomInfo currentRoom;
 
     public ChatPanel(ChatService chatService, Session session) {
         this.chatService = chatService;

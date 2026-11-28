@@ -7,7 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class RoomCellRenderer extends DefaultListCellRenderer {
-    private final Session session;
+    private final transient Session session;
     private boolean drawCard;
 
     public RoomCellRenderer(Session session) {

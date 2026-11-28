@@ -40,9 +40,10 @@ public class MessageController {
             case OpenDmFailed m -> roomService.handleOpenDmFailed(m);
             case RoomHistory m -> chatService.handleRoomHistory(m);
             case ChatMessage m -> chatService.handleChatArrived(m);
-            case ErrorMessage m -> {
-            }
             case RoomDeleted m -> roomService.handleRoomDeleted(m);
+
+            // not implemented yet
+            case ErrorMessage m -> {}
         }
     }
 }

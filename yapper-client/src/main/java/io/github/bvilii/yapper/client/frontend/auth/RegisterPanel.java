@@ -52,7 +52,7 @@ public class RegisterPanel extends JPanel implements AuthObserver {
 
         emailField = new JTextField(20);
         emailField.setEditable(true);
-        emailField.setHorizontalAlignment(JTextField.LEFT);
+        emailField.setHorizontalAlignment(SwingConstants.LEFT);
         emailField.setAlignmentX(Component.LEFT_ALIGNMENT);
         emailField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Enter your email");
         emailField.putClientProperty("JTextField.showClearButton", true);
@@ -67,7 +67,7 @@ public class RegisterPanel extends JPanel implements AuthObserver {
 
         usernameField = new JTextField(20);
         usernameField.setEditable(true);
-        usernameField.setHorizontalAlignment(JTextField.LEFT);
+        usernameField.setHorizontalAlignment(SwingConstants.LEFT);
         usernameField.setAlignmentX(Component.LEFT_ALIGNMENT);
         usernameField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Enter your username");
         usernameField.putClientProperty("JTextField.showClearButton", true);
@@ -83,7 +83,7 @@ public class RegisterPanel extends JPanel implements AuthObserver {
         passwordField = new JPasswordField(20);
         passwordField.setEditable(true);
         passwordField.putClientProperty(FlatClientProperties.STYLE, "showRevealButton: true");
-        passwordField.setHorizontalAlignment(JTextField.LEFT);
+        passwordField.setHorizontalAlignment(SwingConstants.LEFT);
         passwordField.setAlignmentX(Component.LEFT_ALIGNMENT);
         passwordField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Enter your password");
         passwordField.setEchoChar('*');
